@@ -1,0 +1,70 @@
+$border-radius-pill: 50rem !default;
+$secondary-color: black !default;
+$breadcrumb-font-size: null !default;
+$breadcrumb-padding-y: 0.25rem !default;
+$breadcrumb-padding-x: 1rem !default;
+$breadcrumb-item-padding-x: 0.5rem !default;
+$breadcrumb-margin-bottom: 0 !default;
+$breadcrumb-bg: white !default;
+$breadcrumb-divider-color: $secondary-color !default;
+$breadcrumb-active-color: $secondary-color !default;
+$breadcrumb-divider: quote('>') !default;
+$breadcrumb-divider-flipped: $breadcrumb-divider !default;
+$breadcrumb-border-radius: $border-radius-pill !default;
+
+@function escape-svg($string) {
+	@if str-index($string, 'data:image/svg+xml') {
+		@each $char,
+			$encoded
+				in ('<': '%3c', '>': '%3e', '#': '%23', '(': '%28', ')': '%29')
+		{
+			$string: str-replace($string, $char, $encoded);
+		}
+	}
+	@return $string;
+}
+
+.hub-breadcrumb__list {
+	--hub-breadcrumb-padding-x: #{$breadcrumb-padding-x};
+	--hub-breadcrumb-padding-y: #{$breadcrumb-padding-y};
+	--hub-breadcrumb-margin-bottom: #{$breadcrumb-margin-bottom};
+	--hub-breadcrumb-bg: #{$breadcrumb-bg};
+	--hub-breadcrumb-border-radius: #{$breadcrumb-border-radius};
+	--hub-breadcrumb-divider-color: #{$breadcrumb-divider-color};
+	--hub-breadcrumb-item-padding-x: #{$breadcrumb-item-padding-x};
+	--hub-breadcrumb-item-active-color: #{$breadcrumb-active-color};
+
+	display: flex;
+	flex-wrap: wrap;
+	padding: var(--hub-breadcrumb-padding-y) var(--hub-breadcrumb-padding-x);
+	margin-bottom: var(--hub-breadcrumb-margin-bottom);
+	list-style: none;
+	background-color: var(--hub-breadcrumb-bg);
+}
+
+.hub-breadcrumb__item {
+	+ .hub-breadcrumb__item {
+		padding-left: var(--hub-breadcrumb-item-padding-x);
+
+		&::before {
+			float: left;
+			padding-right: var(--hub-breadcrumb-item-padding-x);
+			color: var(--hub-breadcrumb-divider-color);
+			// content: escape-svg($breadcrumb-divider) #{'/* rtl:'} escape-svg(
+			// 		$breadcrumb-divider-flipped
+			// 	) #{'*/'};
+			content: var(
+					--hub-breadcrumb-divider,
+					escape-svg($breadcrumb-divider)
+				)
+				#{'/* rtl:'} var(
+					--hub-breadcrumb-divider,
+					escape-svg($breadcrumb-divider-flipped)
+				) #{'*/'};
+		}
+	}
+
+	&--active {
+		color: var(--hub-breadcrumb-item-active-color);
+	}
+}

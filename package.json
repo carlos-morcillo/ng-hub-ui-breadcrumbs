@@ -1,0 +1,34 @@
+{
+	"name": "ng-hub-ui-breadcrumbs",
+	"version": "1.0.2",
+	"description": "A flexible and reusable breadcrumb component for Angular applications that automatically generates breadcrumbs based on routing configuration",
+	"keywords": [
+		"angular",
+		"customizable",
+		"bootstrap",
+		"breadcrumb",
+		"breadcrumbs",
+		"navigation",
+		"routing",
+		"component",
+		"typescript"
+	],
+	"author": "Your Organization",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs"
+	},
+	"bugs": {
+		"url": "https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs/issues"
+	},
+	"homepage": "https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs#readme",
+	"peerDependencies": {
+		"@angular/common": ">=17.0.0",
+		"@angular/core": ">=17.0.0"
+	},
+	"dependencies": {
+		"tslib": "^2.3.0"
+	},
+	"sideEffects": false
+}
