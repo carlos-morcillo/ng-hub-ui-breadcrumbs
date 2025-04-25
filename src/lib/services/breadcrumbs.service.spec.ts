@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { HubBreadcrumbsService } from './hub-breadcrumbs.service';
+import { HubBreadcrumbsService } from './breadcrumbs.service';
 
 describe('HubBreadcrumbsService', () => {
 	let service: HubBreadcrumbsService;

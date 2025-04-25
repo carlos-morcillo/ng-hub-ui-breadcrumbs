@@ -2,7 +2,7 @@ import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { Component, ContentChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HubBreadcrumbItemDirective } from '../../directives/breadcrumb-item.directive';
-import { HubBreadcrumbsService } from '../../services/hub-breadcrumbs.service';
+import { HubBreadcrumbsService } from '../../services/breadcrumbs.service';
 
 @Component({
 	selector: 'hub-breadcrumbs',
