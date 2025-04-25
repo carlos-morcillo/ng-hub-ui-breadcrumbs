@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { BreadcrumbItem } from '../types/breadcrumb-item';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, startWith, map } from 'rxjs';
+import { filter, map, startWith } from 'rxjs';
+import { BreadcrumbItem } from '../models/breadcrumb-item';
 
 @Injectable({
 	providedIn: 'root'

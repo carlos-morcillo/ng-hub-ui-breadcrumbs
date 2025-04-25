@@ -24,7 +24,7 @@ $breadcrumb-border-radius: $border-radius-pill !default;
 	@return $string;
 }
 
-.hub-breadcrumb__list {
+.hub-breadcrumbs__list {
 	--hub-breadcrumb-padding-x: #{$breadcrumb-padding-x};
 	--hub-breadcrumb-padding-y: #{$breadcrumb-padding-y};
 	--hub-breadcrumb-margin-bottom: #{$breadcrumb-margin-bottom};
@@ -42,8 +42,8 @@ $breadcrumb-border-radius: $border-radius-pill !default;
 	background-color: var(--hub-breadcrumb-bg);
 }
 
-.hub-breadcrumb__item {
-	+ .hub-breadcrumb__item {
+.hub-breadcrumbs__item {
+	+ .hub-breadcrumbs__item {
 		padding-left: var(--hub-breadcrumb-item-padding-x);
 
 		&::before {
@@ -57,10 +57,12 @@ $breadcrumb-border-radius: $border-radius-pill !default;
 					--hub-breadcrumb-divider,
 					escape-svg($breadcrumb-divider)
 				)
-				#{'/* rtl:'} var(
+				#{'/* rtl:'}
+				var(
 					--hub-breadcrumb-divider,
 					escape-svg($breadcrumb-divider-flipped)
-				) #{'*/'};
+				)
+				#{'*/'};
 		}
 	}
 

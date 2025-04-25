@@ -162,11 +162,11 @@ You can customize how each breadcrumb item is rendered using a template.
 <hub-breadcrumbs>
   <ng-template hubBreadcrumbItem let-item let-isLast="isLast">
 	@if (!isLast) {
-	  <a [routerLink]="item.url" class="hub-breadcrumb__link">
+	  <a [routerLink]="item.url" class="hub-breadcrumbs__link">
 		{{ item.label }}
 	  </a>
 	} @else {
-	  <span class="hub-breadcrumb__text">{{ item.label }}</span>
+	  <span class="hub-breadcrumbs__text">{{ item.label }}</span>
 	}
   </ng-template>
 </hub-breadcrumbs>
@@ -196,12 +196,12 @@ With icons:
 <hub-breadcrumbs>
   <ng-template hubBreadcrumbItem let-item let-isLast="isLast">
 	@if (!isLast) {
-	  <a [routerLink]="item.url" class="hub-breadcrumb__link">
+	  <a [routerLink]="item.url" class="hub-breadcrumbs__link">
 		<i [class]="item.data?.icon"></i>
 		{{ item.label }}
 	  </a>
 	} @else {
-	  <span class="hub-breadcrumb__text">
+	  <span class="hub-breadcrumbs__text">
 		<i [class]="item.data?.icon"></i>
 		{{ item.label }}
 	  </span>
@@ -228,12 +228,12 @@ With custom separators:
 <hub-breadcrumbs>
   <ng-template hubBreadcrumbItem let-item let-isLast="isLast">
 	@if (!isLast) {
-	  <a [routerLink]="item.url" class="hub-breadcrumb__link">
+	  <a [routerLink]="item.url" class="hub-breadcrumbs__link">
 		{{ item.label }}
 	  </a>
-	  <span class="hub-breadcrumb__separator">→</span>
+	  <span class="hub-breadcrumbs__separator">→</span>
 	} @else {
-	  <span class="hub-breadcrumb__text">{{ item.label }}</span>
+	  <span class="hub-breadcrumbs__text">{{ item.label }}</span>
 	}
   </ng-template>
 </hub-breadcrumbs>
@@ -274,7 +274,7 @@ $breadcrumb-border-radius: $border-radius-pill !default;
 These variables are exposed for runtime customization:
 
 ```css
-.hub-breadcrumb__list {
+.hub-breadcrumbs__list {
   --hub-breadcrumb-padding-x: 1rem;
   --hub-breadcrumb-padding-y: 0.25rem;
   --hub-breadcrumb-margin-bottom: 0;
@@ -298,7 +298,7 @@ $breadcrumb-active-color: #6c757d;
 
 2. Override CSS variables (runtime):
 ```css
-.hub-breadcrumb__list {
+.hub-breadcrumbs__list {
   --hub-breadcrumb-bg: #f8f9fa;
   --hub-breadcrumb-divider-color: #6c757d;
 }
@@ -306,7 +306,7 @@ $breadcrumb-active-color: #6c757d;
 
 3. Override classes directly:
 ```scss
-.hub-breadcrumb__item {
+.hub-breadcrumbs__item {
   &--active {
 	font-weight: bold;
   }
@@ -325,9 +325,9 @@ $breadcrumb-divider-flipped: quote('<');
 
 The component uses BEM methodology:
 - `.hub-breadcrumb` - Block (host component)
-- `.hub-breadcrumb__list` - Element (container)
-- `.hub-breadcrumb__item` - Element (each breadcrumb)
-- `.hub-breadcrumb__item--active` - Modifier (active state)
+- `.hub-breadcrumbs__list` - Element (container)
+- `.hub-breadcrumbs__item` - Element (each breadcrumb)
+- `.hub-breadcrumbs__item--active` - Modifier (active state)
 
 ### Integration with Bootstrap
 

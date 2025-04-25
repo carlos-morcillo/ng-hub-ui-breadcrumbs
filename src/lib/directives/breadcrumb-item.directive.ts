@@ -1,9 +1,8 @@
 import { Directive, inject, TemplateRef } from '@angular/core';
-import { BreadcrumbTemplateContext } from '../types/breadcrumb-template-context';
+import { BreadcrumbTemplateContext } from '../models/breadcrumb-template-context';
 
 @Directive({
-	selector: '[hubBreadcrumbItem]',
-	standalone: true
+	selector: '[hubBreadcrumbItem]'
 })
 export class HubBreadcrumbItemDirective {
 	template = inject(TemplateRef<BreadcrumbTemplateContext>);

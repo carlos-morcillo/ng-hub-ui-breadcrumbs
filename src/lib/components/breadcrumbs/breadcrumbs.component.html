@@ -1,0 +1,33 @@
+<nav aria-label="breadcrumb" class="hub-breadcrumbs__nav">
+	<ol class="hub-breadcrumbs__list">
+		@for (item of breadcrumbs$ | async; track item; let last = $last) {
+			<li
+				class="hub-breadcrumbs__item"
+				[class.hub-breadcrumbs__item--active]="last"
+			>
+				@if (itemTemplate) {
+					<ng-container
+						[ngTemplateOutlet]="itemTemplate.template"
+						[ngTemplateOutletContext]="{
+							$implicit: item,
+							isLast: last
+						}"
+					/>
+				} @else {
+					@if (!last) {
+						<a
+							[routerLink]="item.url"
+							class="hub-breadcrumbs__link"
+						>
+							{{ item.label }}
+						</a>
+					} @else {
+						<span class="hub-breadcrumbs__text">{{
+							item.label
+						}}</span>
+					}
+				}
+			</li>
+		}
+	</ol>
+</nav>
