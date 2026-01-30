@@ -575,7 +575,7 @@ We follow the [Angular Style Guide](https://angular.io/guide/styleguide):
 
 If you find this project helpful and would like to support its development, you can buy me a coffee:
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/carlosmorcillo)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/carlosmorcillo)
 
 Your support is greatly appreciated and helps maintain and improve this project!
 
