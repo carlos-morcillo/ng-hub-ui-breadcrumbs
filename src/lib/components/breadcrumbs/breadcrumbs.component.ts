@@ -8,7 +8,6 @@ import { HubBreadcrumbsService } from '../../services/breadcrumbs.service';
 	selector: 'hub-breadcrumbs',
 	imports: [AsyncPipe, RouterLink, NgTemplateOutlet],
 	templateUrl: './breadcrumbs.component.html',
-	styleUrl: './breadcrumbs.component.scss',
 	host: {
 		class: 'hub-breadcrumbs'
 	}

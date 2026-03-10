@@ -233,118 +233,37 @@ A structural directive used to define a custom template for breadcrumb items.
 
 ## Styling
 
-You can customize the appearance using CSS variables or SCSS variables if you are using Sass.
+`ng-hub-ui-breadcrumbs` is fully style-configurable through CSS custom properties.
 
-### CSS Variables
+For a complete and up-to-date token catalog, see [CSS Variables Reference](./docs/css-variables-reference.md).
 
-These variables are exposed for runtime customization:
+### Import styles
 
-| Variable                             | Default   | Description                          |
-| ------------------------------------ | --------- | ------------------------------------ |
-| `--hub-breadcrumb-padding-x`         | `1rem`    | Horizontal padding of the container. |
-| `--hub-breadcrumb-padding-y`         | `0.25rem` | Vertical padding of the container.   |
-| `--hub-breadcrumb-margin-bottom`     | `0`       | Bottom margin of the container.      |
-| `--hub-breadcrumb-bg`                | `white`   | Background color.                    |
-| `--hub-breadcrumb-border-radius`     | `50rem`   | Border radius of the container.      |
-| `--hub-breadcrumb-divider-color`     | `black`   | Color of the separator.              |
-| `--hub-breadcrumb-item-padding-x`    | `0.5rem`  | Horizontal padding of each item.     |
-| `--hub-breadcrumb-item-active-color` | `black`   | Color of the active (last) item.     |
-
-### SCSS Variables
-
-These SCSS variables set the default values and can be overridden:
-
-| Variable                      | Default               | Description                |
-| ----------------------------- | --------------------- | -------------------------- |
-| `$border-radius-pill`         | `50rem`               | Default border radius.     |
-| `$secondary-color`            | `black`               | Default secondary color.   |
-| `$breadcrumb-font-size`       | `null`                | Font size (null inherits). |
-| `$breadcrumb-padding-y`       | `0.25rem`             | Vertical padding.          |
-| `$breadcrumb-padding-x`       | `1rem`                | Horizontal padding.        |
-| `$breadcrumb-item-padding-x`  | `0.5rem`              | Item horizontal padding.   |
-| `$breadcrumb-margin-bottom`   | `0`                   | Bottom margin.             |
-| `$breadcrumb-bg`              | `white`               | Background color.          |
-| `$breadcrumb-divider-color`   | `$secondary-color`    | Divider color.             |
-| `$breadcrumb-active-color`    | `$secondary-color`    | Active item color.         |
-| `$breadcrumb-divider`         | `quote('>')`          | Divider character.         |
-| `$breadcrumb-divider-flipped` | `$breadcrumb-divider` | Divider for RTL.           |
-| `$breadcrumb-border-radius`   | `$border-radius-pill` | Border radius.             |
-
-### Customizing Styles
-
-1. **Override SCSS variables** (compile-time):
-
-    ```scss
-    // your-styles.scss
-    $breadcrumb-bg: #f8f9fa;
-    $breadcrumb-divider: quote('→');
-    $breadcrumb-active-color: #6c757d;
-    ```
-
-2. **Override CSS variables** (runtime):
-
-    ```css
-    .hub-breadcrumbs__list {
-    	--hub-breadcrumb-bg: #f8f9fa;
-    	--hub-breadcrumb-divider-color: #6c757d;
-    }
-    ```
-
-3. **Override classes directly**:
-    ```scss
-    .hub-breadcrumbs__item {
-    	&--active {
-    		font-weight: bold;
-    	}
-    }
-    ```
-
-### Inline Style Customization
-
-You can customize the breadcrumb directly in your template using inline styles:
-
-```html
-<hub-breadcrumbs
-	style="
-  --hub-breadcrumb-divider: '🐸';
-  --hub-breadcrumb-bg: #e9ecef;
-  --hub-breadcrumb-item-active-color: #0d6efd;
-"
-></hub-breadcrumbs>
+```scss
+@use 'ng-hub-ui-breadcrumbs/src/lib/styles/breadcrumbs.scss';
 ```
 
-Common use cases:
+### Quick customization example (framework-agnostic)
 
-- **Custom divider**:
+```scss
+.hub-breadcrumbs__list {
+	--hub-breadcrumb-bg: #f8f9fa;
+	--hub-breadcrumb-divider: '→';
+	--hub-breadcrumb-link-color: #0d6efd;
+	--hub-breadcrumb-item-active-color: #6c757d;
+}
+```
 
-    ```html
-    <hub-breadcrumbs style="--hub-breadcrumb-divider: '→'"></hub-breadcrumbs>
-    <hub-breadcrumbs style="--hub-breadcrumb-divider: '>'"></hub-breadcrumbs>
-    <hub-breadcrumbs style="--hub-breadcrumb-divider: '/'"></hub-breadcrumbs>
-    ```
+### Bootstrap integration (optional)
 
-- **Custom colors**:
-
-    ```html
-    <hub-breadcrumbs
-    	style="
-      --hub-breadcrumb-bg: transparent;
-      --hub-breadcrumb-divider-color: #6c757d;
-      --hub-breadcrumb-item-active-color: #0d6efd;
-    "
-    ></hub-breadcrumbs>
-    ```
-
-- **Custom spacing**:
-    ```html
-    <hub-breadcrumbs
-    	style="
-      --hub-breadcrumb-padding-x: 0;
-      --hub-breadcrumb-padding-y: 0;
-      --hub-breadcrumb-item-padding-x: 1rem;
-    "
-    ></hub-breadcrumbs>
-    ```
+```scss
+.hub-breadcrumbs__list {
+	--hub-breadcrumb-bg: var(--bs-light);
+	--hub-breadcrumb-link-color: var(--bs-primary);
+	--hub-breadcrumb-link-hover-color: var(--bs-primary-text-emphasis);
+	--hub-breadcrumb-item-active-color: var(--bs-secondary-color);
+}
+```
 
 ## Contributing
 
