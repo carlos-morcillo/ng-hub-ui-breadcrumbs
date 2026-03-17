@@ -32,13 +32,9 @@ This allows:
 
 ---
 
-## Importing Styles
+## Styles
 
-Add breadcrumbs styles to your global stylesheet:
-
-```scss
-@use 'ng-hub-ui-breadcrumbs/src/lib/styles/breadcrumbs.scss';
-```
+Styles are automatically included when the component is used — no manual import required.
 
 ---
 
@@ -62,7 +58,7 @@ Add breadcrumbs styles to your global stylesheet:
 
 ## Breadcrumbs Variables
 
-Defined and consumed by `projects/breadcrumbs/src/lib/styles/breadcrumbs.scss`.
+Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/breadcrumb.component.scss`.
 
 ### Core
 
@@ -73,6 +69,7 @@ Defined and consumed by `projects/breadcrumbs/src/lib/styles/breadcrumbs.scss`.
 | `--hub-breadcrumb-margin-bottom` | `var(--hub-ref-space-0, 0)` |
 | `--hub-breadcrumb-bg` | `var(--hub-sys-surface-page, transparent)` |
 | `--hub-breadcrumb-color` | `var(--hub-sys-text-primary, #212529)` |
+| `--hub-breadcrumb-font-size` | `inherit` |
 | `--hub-breadcrumb-border-radius` | `var(--hub-ref-radius-md, 0.375rem)` |
 | `--hub-breadcrumb-item-padding-x` | `var(--hub-ref-space-1, 0.5rem)` |
 
@@ -101,7 +98,7 @@ Defined and consumed by `projects/breadcrumbs/src/lib/styles/breadcrumbs.scss`.
 ### Framework-Agnostic
 
 ```scss
-.hub-breadcrumbs__list {
+.hub-breadcrumb__list {
   --hub-breadcrumb-bg: #f8f9fa;
   --hub-breadcrumb-divider: '→';
   --hub-breadcrumb-link-color: #0d6efd;
@@ -113,7 +110,7 @@ Defined and consumed by `projects/breadcrumbs/src/lib/styles/breadcrumbs.scss`.
 ### Bootstrap Integration (Optional)
 
 ```scss
-.hub-breadcrumbs__list {
+.hub-breadcrumb__list {
   --hub-breadcrumb-bg: var(--bs-light);
   --hub-breadcrumb-link-color: var(--bs-primary);
   --hub-breadcrumb-link-hover-color: var(--bs-primary-text-emphasis);
@@ -124,7 +121,7 @@ Defined and consumed by `projects/breadcrumbs/src/lib/styles/breadcrumbs.scss`.
 ### Dark Surface
 
 ```scss
-.app-theme-dark .hub-breadcrumbs__list {
+.app-theme-dark .hub-breadcrumb__list {
   --hub-breadcrumb-bg: #212529;
   --hub-breadcrumb-color: #f8f9fa;
   --hub-breadcrumb-divider-color: #adb5bd;

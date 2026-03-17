@@ -1,22 +1,22 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
-import { Component, ContentChild, inject } from '@angular/core';
+import { Component, contentChild, inject, TemplateRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HubBreadcrumbItemDirective } from '../../directives/breadcrumb-item.directive';
 import { HubBreadcrumbsService } from '../../services/breadcrumbs.service';
 
 @Component({
-	selector: 'hub-breadcrumbs',
+	selector: 'hub-breadcrumb',
 	imports: [AsyncPipe, RouterLink, NgTemplateOutlet],
-	templateUrl: './breadcrumbs.component.html',
+	templateUrl: './breadcrumb.component.html',
+	styleUrl: './breadcrumb.component.scss',
 	host: {
-		class: 'hub-breadcrumbs'
+		class: 'hub-breadcrumb'
 	}
 })
-export class HubBreadcrumbsComponent {
+export class HubBreadcrumbComponent {
 	#breadcrumbsSvc = inject(HubBreadcrumbsService);
 
-	@ContentChild(HubBreadcrumbItemDirective)
-	itemTemplate?: HubBreadcrumbItemDirective;
+	readonly itemTemplate = contentChild(HubBreadcrumbItemDirective, { read: TemplateRef });
 
 	breadcrumbs$ = this.#breadcrumbsSvc.breadcrumbs$;
 }

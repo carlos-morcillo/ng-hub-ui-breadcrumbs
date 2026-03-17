@@ -48,14 +48,14 @@ npm install ng-hub-ui-breadcrumbs
 
 ### 1. Import the Component
 
-You can import the `HubBreadcrumbsComponent` directly in your standalone component or module.
+You can import the `HubBreadcrumbComponent` directly in your standalone component or module.
 
 ```typescript
-import { HubBreadcrumbsComponent } from 'ng-hub-ui-breadcrumbs';
+import { HubBreadcrumbComponent } from 'ng-hub-ui-breadcrumbs';
 
 @Component({
 	// ...
-	imports: [HubBreadcrumbsComponent]
+	imports: [HubBreadcrumbComponent]
 })
 export class AppComponent {}
 ```
@@ -65,7 +65,7 @@ export class AppComponent {}
 Place the component in your application's main layout or wherever you want breadcrumbs to appear.
 
 ```html
-<hub-breadcrumbs></hub-breadcrumbs>
+<hub-breadcrumb></hub-breadcrumb>
 ```
 
 ### 3. Configure Routes
@@ -167,7 +167,7 @@ You can attach arbitrary data (like icons) to your route config and use it in a 
 
 ```html
 <!-- Custom Template Implementation -->
-<hub-breadcrumbs>
+<hub-breadcrumb>
 	<ng-template hubBreadcrumbItem let-item let-isLast="isLast">
 		<!-- 'item.data' contains the entire route data object -->
 		@if (item.data.icon) {
@@ -183,7 +183,7 @@ You can attach arbitrary data (like icons) to your route config and use it in a 
 Fully customize the structure, including separators/dividers.
 
 ```html
-<hub-breadcrumbs>
+<hub-breadcrumb>
 	<ng-template hubBreadcrumbItem let-item let-isLast="isLast">
 		<span class="my-breadcrumb-item">
 			<a [routerLink]="item.url">{{ item.label }}</a>
@@ -198,13 +198,13 @@ Fully customize the structure, including separators/dividers.
 
 ## API Reference
 
-### HubBreadcrumbsComponent
+### HubBreadcrumbComponent
 
 The main container component. It doesn't have any inputs as it reads directly from the Router.
 
 | Selector          | Exported As      |
 | ----------------- | ---------------- |
-| `hub-breadcrumbs` | `hubBreadcrumbs` |
+| `hub-breadcrumb` | `hubBreadcrumb` |
 
 ### HubBreadcrumbItemDirective
 
@@ -237,16 +237,10 @@ A structural directive used to define a custom template for breadcrumb items.
 
 For a complete and up-to-date token catalog, see [CSS Variables Reference](./docs/css-variables-reference.md).
 
-### Import styles
-
-```scss
-@use 'ng-hub-ui-breadcrumbs/src/lib/styles/breadcrumbs.scss';
-```
-
 ### Quick customization example (framework-agnostic)
 
 ```scss
-.hub-breadcrumbs__list {
+.hub-breadcrumb__list {
 	--hub-breadcrumb-bg: #f8f9fa;
 	--hub-breadcrumb-divider: '→';
 	--hub-breadcrumb-link-color: #0d6efd;
@@ -257,7 +251,7 @@ For a complete and up-to-date token catalog, see [CSS Variables Reference](./doc
 ### Bootstrap integration (optional)
 
 ```scss
-.hub-breadcrumbs__list {
+.hub-breadcrumb__list {
 	--hub-breadcrumb-bg: var(--bs-light);
 	--hub-breadcrumb-link-color: var(--bs-primary);
 	--hub-breadcrumb-link-hover-color: var(--bs-primary-text-emphasis);
