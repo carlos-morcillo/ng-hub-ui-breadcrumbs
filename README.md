@@ -19,39 +19,55 @@ This package is part of [Hub UI](https://hubui.dev/), a collection of Angular co
 
 This library is part of the **ng-hub-ui** ecosystem:
 
-- [**ng-hub-ui-accordion**](https://www.npmjs.com/package/ng-hub-ui-accordion)
+- [**ng-hub-ui-accordion**](https://www.npmjs.com/package/ng-hub-ui-accordion) (deprecated — use ng-hub-ui-panels)
 - [**ng-hub-ui-action-sheet**](https://www.npmjs.com/package/ng-hub-ui-action-sheet)
 - [**ng-hub-ui-avatar**](https://www.npmjs.com/package/ng-hub-ui-avatar)
 - [**ng-hub-ui-board**](https://www.npmjs.com/package/ng-hub-ui-board)
 - [**ng-hub-ui-breadcrumbs**](https://www.npmjs.com/package/ng-hub-ui-breadcrumbs) ← You are here
 - [**ng-hub-ui-calendar**](https://www.npmjs.com/package/ng-hub-ui-calendar)
 - [**ng-hub-ui-dropdown**](https://www.npmjs.com/package/ng-hub-ui-dropdown)
+- [**ng-hub-ui-ds**](https://www.npmjs.com/package/ng-hub-ui-ds)
+- [**ng-hub-ui-forms**](https://www.npmjs.com/package/ng-hub-ui-forms)
 - [**ng-hub-ui-history**](https://www.npmjs.com/package/ng-hub-ui-history)
+- [**ng-hub-ui-milestones**](https://www.npmjs.com/package/ng-hub-ui-milestones)
 - [**ng-hub-ui-modal**](https://www.npmjs.com/package/ng-hub-ui-modal)
 - [**ng-hub-ui-nav**](https://www.npmjs.com/package/ng-hub-ui-nav)
 - [**ng-hub-ui-paginable**](https://www.npmjs.com/package/ng-hub-ui-paginable)
+- [**ng-hub-ui-panels**](https://www.npmjs.com/package/ng-hub-ui-panels)
 - [**ng-hub-ui-portal**](https://www.npmjs.com/package/ng-hub-ui-portal)
+- [**ng-hub-ui-skeleton**](https://www.npmjs.com/package/ng-hub-ui-skeleton)
 - [**ng-hub-ui-sortable**](https://www.npmjs.com/package/ng-hub-ui-sortable)
 - [**ng-hub-ui-stepper**](https://www.npmjs.com/package/ng-hub-ui-stepper)
 - [**ng-hub-ui-utils**](https://www.npmjs.com/package/ng-hub-ui-utils)
 
 ## Table of Contents
 
+- [Description](#description)
 - [Features](#features)
 - [Installation](#installation)
+- [Quick Start](#quick-start)
 - [Usage](#usage)
-- [Examples](#examples)
 - [API Reference](#api-reference)
 - [Styling](#styling)
-- [Support & License](#support--license)
+- [Changelog](#changelog)
+- [Contributing](#contributing)
+- [Support](#support)
+- [License](#license)
+
+## Description
+
+`ng-hub-ui-breadcrumbs` is a lightweight, fully reactive breadcrumb component for Angular standalone applications. Instead of manually maintaining breadcrumb trails, the library subscribes to the Angular `Router` and rebuilds the breadcrumb list automatically on every navigation, reading a `breadcrumb` entry from each route's `data` configuration.
+
+It supports static labels, dynamic labels resolved from route data (via functions or `{key}` interpolation), lazy-loaded routes, and full template customization through a structural directive. Styling is handled entirely through CSS custom properties, so the component adapts to any design system or Bootstrap theme without overriding internal markup.
 
 ## Features
 
 - **Automatic Breadcrumb Generation**: Automatically builds breadcrumbs from your Angular `Routes` configuration.
 - **Dynamic Labels**: Supports dynamic labels via functions or string interpolation using resolved data.
-- **Custom Templates**: Full control over how each breadcrumb item is rendered using directives.
-- **RTL Support**: Built-in support for Right-to-Left languages.
-- **Lazy Loading Compatible**: Works seamlessly with lazy-loaded modules.
+- **Custom Templates**: Full control over how each breadcrumb item is rendered using a structural directive.
+- **RTL Support**: Ships a flipped divider token (`--hub-breadcrumb-divider-flipped`) for Right-to-Left layouts.
+- **Lazy Loading Compatible**: Works seamlessly with lazy-loaded routes.
+- **Zero Manual Style Import**: Styles are bundled within the component — no separate SCSS import is required.
 
 ## Installation
 
@@ -59,11 +75,50 @@ This library is part of the **ng-hub-ui** ecosystem:
 npm install ng-hub-ui-breadcrumbs
 ```
 
+## Quick Start
+
+Get up and running in under five minutes.
+
+### 1. Install
+
+```bash
+npm install ng-hub-ui-breadcrumbs
+```
+
+### 2. Import the component
+
+```typescript
+import { HubBreadcrumbComponent } from 'ng-hub-ui-breadcrumbs';
+
+@Component({
+	// ...
+	imports: [HubBreadcrumbComponent]
+})
+export class AppComponent {}
+```
+
+### 3. Add breadcrumb data to your routes
+
+```typescript
+const routes: Routes = [
+	{ path: '', data: { breadcrumb: 'Home' } },
+	{ path: 'products', data: { breadcrumb: 'Products' } }
+];
+```
+
+### 4. Drop the component in your layout
+
+```html
+<hub-breadcrumb></hub-breadcrumb>
+```
+
+**💡 That's it!** The breadcrumb trail now updates automatically as the user navigates.
+
 ## Usage
 
 ### 1. Import the Component
 
-You can import the `HubBreadcrumbComponent` directly in your standalone component or module.
+You can import the `HubBreadcrumbComponent` directly in your standalone component, or use `HubBreadcrumbsModule` in a module-based setup.
 
 ```typescript
 import { HubBreadcrumbComponent } from 'ng-hub-ui-breadcrumbs';
@@ -87,7 +142,6 @@ Place the component in your application's main layout or wherever you want bread
 
 The most critical part is adding `data: { breadcrumb: '...' }` to your routes.
 
-````typescript
 ```typescript
 const routes: Routes = [
 	{
@@ -102,23 +156,23 @@ const routes: Routes = [
 		]
 	}
 ];
-````
+```
 
 ### 4. Working with Lazy Loading
 
-For lazy-loaded modules, configure the parent route with breadcrumb data:
+For lazy-loaded routes, configure the parent route with breadcrumb data:
 
 ```typescript
-// app-routing.module.ts
+// app.routes.ts
 const routes: Routes = [
 	{
 		path: 'admin',
 		data: { breadcrumb: 'Administration' },
-		loadChildren: () => import('./admin/admin.module').then((m) => m.AdminModule)
+		loadChildren: () => import('./admin/admin.routes').then((m) => m.ADMIN_ROUTES)
 	}
 ];
 
-// admin-routing.module.ts
+// admin.routes.ts
 const adminRoutes: Routes = [
 	{
 		path: 'users',
@@ -129,11 +183,9 @@ const adminRoutes: Routes = [
 
 This will generate breadcrumbs like: Home > Administration > Users
 
-## Examples
-
 ### Dynamic Labels with Functions
 
-You can use a function to generate the breadcrumb label dynamically based on route data.
+You can use a function to generate the breadcrumb label dynamically based on route data. The function receives the resolved route `data`.
 
 ```typescript
 const routes: Routes = [
@@ -167,16 +219,16 @@ const routes: Routes = [
 
 ### Custom Icons
 
-You can attach arbitrary data (like icons) to your route config and use it in a custom template.
+You can attach arbitrary data (like icons) to your route config and use it in a custom template via the `hubBreadcrumbItem` directive.
 
 ```typescript
 // Route Configuration
 {
-  path: 'settings',
-  data: {
-    breadcrumb: 'Settings',
-    icon: 'fa fa-cog' // Custom data property
-  }
+	path: 'settings',
+	data: {
+		breadcrumb: 'Settings',
+		icon: 'fa fa-cog' // Custom data property
+	}
 }
 ```
 
@@ -190,7 +242,7 @@ You can attach arbitrary data (like icons) to your route config and use it in a 
 		}
 		<a [routerLink]="item.url">{{ item.label }}</a>
 	</ng-template>
-</hub-breadcrumbs>
+</hub-breadcrumb>
 ```
 
 ### Custom Template & Separators
@@ -208,18 +260,20 @@ Fully customize the structure, including separators/dividers.
 		<span class="separator"> / </span>
 		}
 	</ng-template>
-</hub-breadcrumbs>
+</hub-breadcrumb>
 ```
 
 ## API Reference
 
 ### HubBreadcrumbComponent
 
-The main container component. It doesn't have any inputs as it reads directly from the Router.
+The main container component. It has no inputs — it reads the breadcrumb trail directly from the Angular `Router`.
 
-| Selector          | Exported As      |
-| ----------------- | ---------------- |
-| `hub-breadcrumb` | `hubBreadcrumb` |
+| Selector         | Host class        |
+| ---------------- | ----------------- |
+| `hub-breadcrumb` | `.hub-breadcrumb` |
+
+It projects a single optional content template via the `hubBreadcrumbItem` directive (read through `contentChild`). When no template is provided, the component renders a default breadcrumb list.
 
 ### HubBreadcrumbItemDirective
 
@@ -229,26 +283,38 @@ A structural directive used to define a custom template for breadcrumb items.
 | --------------------- | --------------------------- |
 | `[hubBreadcrumbItem]` | `BreadcrumbTemplateContext` |
 
+### HubBreadcrumbsService
+
+An injectable (`providedIn: 'root'`) service that exposes the reactive breadcrumb stream. The component uses it internally; you can also inject it directly when you need the breadcrumb data elsewhere.
+
+| Member          | Type                          | Description                                                                   |
+| --------------- | ----------------------------- | ----------------------------------------------------------------------------- |
+| `breadcrumbs$`  | `Observable<BreadcrumbItem[]>` | Emits the current breadcrumb trail on every `NavigationEnd` (and on startup). |
+
+### HubBreadcrumbsModule
+
+An optional `NgModule` that imports and exports `HubBreadcrumbComponent` and `HubBreadcrumbItemDirective` for module-based applications.
+
 ### Interfaces
 
 #### BreadcrumbItem
 
-| Property | Type     | Description                                             |
-| -------- | -------- | ------------------------------------------------------- |
-| `label`  | `string` | The resolved text to display for the breadcrumb.        |
-| `url`    | `string` | The full URL path to navigate to.                       |
-| `data`   | `any`    | The original route data object (useful for icons, etc). |
+| Property | Type     | Description                                              |
+| -------- | -------- | -------------------------------------------------------- |
+| `label`  | `string` | The resolved text to display for the breadcrumb.         |
+| `url`    | `string` | The full URL path to navigate to.                        |
+| `data`   | `any`    | The original route data object (useful for icons, etc.). |
 
 #### BreadcrumbTemplateContext
 
-| Property    | Type             | Description                                                   |
-| ----------- | ---------------- | ------------------------------------------------------------- |
-| `$implicit` | `BreadcrumbItem` | The current breadcrumb item object.                           |
-| `isLast`    | `boolean`        | True if this item is the last one in the list (current page). |
+| Property    | Type             | Description                                                    |
+| ----------- | ---------------- | -------------------------------------------------------------- |
+| `$implicit` | `BreadcrumbItem` | The current breadcrumb item object (bound via `let-item`).     |
+| `isLast`    | `boolean`        | `true` if this item is the last one in the list (current page). |
 
 ## Styling
 
-`ng-hub-ui-breadcrumbs` is fully style-configurable through CSS custom properties.
+`ng-hub-ui-breadcrumbs` is fully style-configurable through CSS custom properties. Styles are bundled within the component, so no manual import is required.
 
 For a complete and up-to-date token catalog, see [CSS Variables Reference](./docs/css-variables-reference.md).
 
@@ -274,6 +340,12 @@ For a complete and up-to-date token catalog, see [CSS Variables Reference](./doc
 }
 ```
 
+## Changelog
+
+All notable changes are documented in the [CHANGELOG.md](./CHANGELOG.md). For breaking changes, see [BREAKING_CHANGES.md](./BREAKING_CHANGES.md).
+
+The latest release is **v21.1.0**, which renamed the selector from `hub-breadcrumbs` to `hub-breadcrumb` and bundled the component styles (manual style imports are no longer required).
+
 ## Contributing
 
 We appreciate your interest in contributing to Hub Breadcrumb! Here's how you can help:
@@ -294,24 +366,10 @@ We appreciate your interest in contributing to Hub Breadcrumb! Here's how you ca
     ```
 
 3.  **Start the development server**
+
     ```bash
     npm start
     ```
-
-### Testing
-
-Run the test suite:
-
-```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run e2e
-
-# Test coverage
-npm run test:coverage
-```
 
 ### Commit Guidelines
 
@@ -320,7 +378,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `feat:` New features
 - `fix:` Bug fixes
 - `docs:` Documentation changes
-- `style:` Code style changes (formatting, etc)
+- `style:` Code style changes (formatting, etc.)
 - `refactor:` Code refactors
 - `test:` Adding or updating tests
 - `chore:` Maintenance tasks
@@ -331,7 +389,7 @@ Example:
 git commit -m "feat: add custom divider support"
 ```
 
-## Support & License
+## Support
 
 If you find this project helpful and would like to support its development, you can buy me a coffee:
 
@@ -339,8 +397,12 @@ If you find this project helpful and would like to support its development, you 
 
 Your support is greatly appreciated and helps maintain and improve this project!
 
+For bugs and feature requests, please open an issue at https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs/issues.
+
+## License
+
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-Made with ❤️ by [Carlos Morcillo Fernández]
+Made with ❤️ by [Carlos Morcillo Fernández](https://www.carlosmorcillo.com)
