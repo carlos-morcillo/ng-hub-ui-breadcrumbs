@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.1.0] - 2026-06-24
+
+### Added
+
+- New **`variant` input** on `<hub-breadcrumb>` selecting a **semantic accent** for the links: `<hub-breadcrumb variant="success">` recolours the links (and their hover) to the matching design-system family while the current item stays muted. The built-in values (`primary` / `success` / `danger` / `warning` / `info`) use the exact tints via a CSS `@each` loop; **any other string is also accepted** — the link colour reads `--hub-sys-color-<variant>`. Defaults to the standard link colour (no visual change). New token `--hub-breadcrumb-accent` (the link colour now follows it).
+- New **`hub-breadcrumb-theme()` Sass mixin** (`styles/mixins/breadcrumb-theme`) — theme a breadcrumb in one call: surface, spacing, divider, current-item colour, links and accent. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-breadcrumb-*` overrides. Token-based, no Bootstrap dependency.
+
 ## [22.0.0] - 2026-06-17
 
 ### Changed

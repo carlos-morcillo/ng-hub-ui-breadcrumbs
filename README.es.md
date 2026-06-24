@@ -267,11 +267,25 @@ Personaliza completamente la estructura, incluidos los separadores/divisores.
 
 ### HubBreadcrumbComponent
 
-El componente contenedor principal. No tiene inputs: lee la ruta de breadcrumbs directamente del `Router` de Angular.
+El componente contenedor principal. Lee la ruta de breadcrumbs directamente del `Router` de Angular y expone un único input opcional para tematizar los enlaces.
 
 | Selector         | Clase del host    |
 | ---------------- | ----------------- |
 | `hub-breadcrumb` | `.hub-breadcrumb` |
+
+#### Inputs
+
+| Input     | Tipo     | Por defecto | Descripción                                                                                                                                                                                                                                                                                                                                       |
+| --------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant` | `string` | `undefined` | Selecciona un **acento semántico** para los enlaces del breadcrumb y su hover. Los valores integrados (`primary`, `success`, `danger`, `warning`, `info`) mapean a los tintes exactos del sistema de diseño; **también se acepta cualquier otra cadena**, que se resuelve a través de `--hub-sys-color-<variant>`. El elemento actual (el último) permanece siempre atenuado. Si se omite, los enlaces usan el color de enlace estándar (sin cambio visual). |
+
+```html
+<!-- Acento semántico integrado -->
+<hub-breadcrumb variant="success"></hub-breadcrumb>
+
+<!-- Acento personalizado — se resuelve a var(--hub-sys-color-brand) -->
+<hub-breadcrumb variant="brand"></hub-breadcrumb>
+```
 
 Proyecta una única plantilla de contenido opcional mediante la directiva `hubBreadcrumbItem` (leída a través de `contentChild`). Cuando no se proporciona ninguna plantilla, el componente renderiza una lista de breadcrumbs por defecto.
 
@@ -329,6 +343,16 @@ Para un catálogo completo y actualizado de tokens, consulta la [Referencia de v
 }
 ```
 
+### Token de acento semántico
+
+El color del enlace sigue al token `--hub-breadcrumb-accent` (que a su vez toma por defecto el color de enlace estándar). Al definir un `variant` se re-basa este token; también puedes sobrescribirlo directamente:
+
+```scss
+.hub-breadcrumb {
+	--hub-breadcrumb-accent: var(--hub-sys-color-info);
+}
+```
+
 ### Integración con Bootstrap (opcional)
 
 ```scss
@@ -337,6 +361,23 @@ Para un catálogo completo y actualizado de tokens, consulta la [Referencia de v
 	--hub-breadcrumb-link-color: var(--bs-primary);
 	--hub-breadcrumb-link-hover-color: var(--bs-primary-text-emphasis);
 	--hub-breadcrumb-item-active-color: var(--bs-secondary-color);
+}
+```
+
+### Tematización con el mixin Sass `hub-breadcrumb-theme()`
+
+Para un tema en una sola llamada que ajuste la superficie, el espaciado, el separador, el color del elemento actual, los enlaces y el acento, usa el mixin `hub-breadcrumb-theme()`. Cada parámetro es opcional y vale `null` por defecto, de modo que solo se emiten como sobrescrituras `--hub-breadcrumb-*` los que pases. Está basado en tokens y no depende de Bootstrap.
+
+```scss
+@use 'ng-hub-ui-breadcrumbs/styles/mixins/breadcrumb-theme' as *;
+
+.docs-breadcrumb {
+	@include hub-breadcrumb-theme(
+		$bg: #f8fafc,
+		$padding-x: 0.75rem,
+		$divider: "'/'", // mantén las comillas interiores — alimenta `content` de CSS
+		$accent: var(--hub-sys-color-info)
+	);
 }
 ```
 

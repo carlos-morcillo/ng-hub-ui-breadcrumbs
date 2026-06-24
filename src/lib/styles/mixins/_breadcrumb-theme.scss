@@ -1,0 +1,110 @@
+// ─────────────────────────────────────────────────────────────────────────
+// hub-breadcrumb-theme — one-call theming for `<hub-breadcrumb>`
+// ─────────────────────────────────────────────────────────────────────────
+//
+// Override any of the `--hub-breadcrumb-*` design tokens in a single include.
+// Every parameter is OPTIONAL and defaults to `null`: only the parameters you
+// pass are emitted, so the rest keep the component's defaults. Token-based and
+// self-contained (no Bootstrap dependencies).
+//
+// The semantic `variant` accent (primary / success / … / custom) is applied
+// automatically; use this mixin to restyle the shell — surface, spacing,
+// divider, link colours — or to set a brand accent on a custom selector.
+//
+// @example
+//
+//   @use 'ng-hub-ui-breadcrumbs/styles/mixins/breadcrumb-theme' as *;
+//
+//   .docs-breadcrumb {
+//     @include hub-breadcrumb-theme(
+//       $bg: #f8fafc,
+//       $padding-x: 0.75rem,
+//       $divider: "'/'",   // keep the inner quotes — it feeds CSS `content`
+//       $accent: var(--hub-sys-color-info)
+//     );
+//   }
+//
+// scss-docs-start hub-breadcrumb-theme
+@mixin hub-breadcrumb-theme(
+	// ── Surface ──
+	$bg: null,
+	$color: null,
+	$border-radius: null,
+	$padding-x: null,
+	$padding-y: null,
+	$margin-bottom: null,
+	$font-size: null,
+	// ── Divider ──
+	$divider: null,
+	$divider-flipped: null,
+	$divider-color: null,
+	$item-padding-x: null,
+	// ── Current (last) item ──
+	$item-active-color: null,
+	// ── Links / accent ──
+	$accent: null,
+	$link-color: null,
+	$link-hover-color: null,
+	$link-decoration: null,
+	$link-hover-decoration: null
+) {
+	// Surface
+	@if $bg != null {
+		--hub-breadcrumb-bg: #{$bg};
+	}
+	@if $color != null {
+		--hub-breadcrumb-color: #{$color};
+	}
+	@if $border-radius != null {
+		--hub-breadcrumb-border-radius: #{$border-radius};
+	}
+	@if $padding-x != null {
+		--hub-breadcrumb-padding-x: #{$padding-x};
+	}
+	@if $padding-y != null {
+		--hub-breadcrumb-padding-y: #{$padding-y};
+	}
+	@if $margin-bottom != null {
+		--hub-breadcrumb-margin-bottom: #{$margin-bottom};
+	}
+	@if $font-size != null {
+		--hub-breadcrumb-font-size: #{$font-size};
+	}
+
+	// Divider
+	@if $divider != null {
+		--hub-breadcrumb-divider: #{$divider};
+	}
+	@if $divider-flipped != null {
+		--hub-breadcrumb-divider-flipped: #{$divider-flipped};
+	}
+	@if $divider-color != null {
+		--hub-breadcrumb-divider-color: #{$divider-color};
+	}
+	@if $item-padding-x != null {
+		--hub-breadcrumb-item-padding-x: #{$item-padding-x};
+	}
+
+	// Current item
+	@if $item-active-color != null {
+		--hub-breadcrumb-item-active-color: #{$item-active-color};
+	}
+
+	// Links / accent
+	@if $accent != null {
+		--hub-breadcrumb-accent: #{$accent};
+	}
+	@if $link-color != null {
+		--hub-breadcrumb-link-color: #{$link-color};
+	}
+	@if $link-hover-color != null {
+		--hub-breadcrumb-link-hover-color: #{$link-hover-color};
+	}
+	@if $link-decoration != null {
+		--hub-breadcrumb-link-decoration: #{$link-decoration};
+	}
+	@if $link-hover-decoration != null {
+		--hub-breadcrumb-link-hover-decoration: #{$link-hover-decoration};
+	}
+}
+// scss-docs-end hub-breadcrumb-theme

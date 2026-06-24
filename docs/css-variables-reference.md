@@ -86,10 +86,13 @@ Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/brea
 | Variable | Default |
 |---|---|
 | `--hub-breadcrumb-item-active-color` | `var(--hub-sys-text-muted, #6c757d)` |
-| `--hub-breadcrumb-link-color` | `var(--hub-sys-link-color, #0d6efd)` |
+| `--hub-breadcrumb-accent` | `var(--hub-sys-link-color, #0d6efd)` |
+| `--hub-breadcrumb-link-color` | `var(--hub-breadcrumb-accent)` |
 | `--hub-breadcrumb-link-hover-color` | `var(--hub-sys-link-hover-color, #0a58ca)` |
 | `--hub-breadcrumb-link-decoration` | `none` |
 | `--hub-breadcrumb-link-hover-decoration` | `underline` |
+
+> `--hub-breadcrumb-accent` is the semantic accent that drives the link colour. Setting a `variant` on `<hub-breadcrumb>` (e.g. `variant="success"`) re-bases it to the matching design-system family; you can also override it directly.
 
 ---
 

@@ -267,11 +267,25 @@ Fully customize the structure, including separators/dividers.
 
 ### HubBreadcrumbComponent
 
-The main container component. It has no inputs — it reads the breadcrumb trail directly from the Angular `Router`.
+The main container component. It reads the breadcrumb trail directly from the Angular `Router` and exposes a single optional input for theming the links.
 
 | Selector         | Host class        |
 | ---------------- | ----------------- |
 | `hub-breadcrumb` | `.hub-breadcrumb` |
+
+#### Inputs
+
+| Input     | Type     | Default     | Description                                                                                                                                                                                                                                                                                                                  |
+| --------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant` | `string` | `undefined` | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `success`, `danger`, `warning`, `info`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change). |
+
+```html
+<!-- Built-in semantic accent -->
+<hub-breadcrumb variant="success"></hub-breadcrumb>
+
+<!-- Custom accent — resolves to var(--hub-sys-color-brand) -->
+<hub-breadcrumb variant="brand"></hub-breadcrumb>
+```
 
 It projects a single optional content template via the `hubBreadcrumbItem` directive (read through `contentChild`). When no template is provided, the component renders a default breadcrumb list.
 
@@ -329,6 +343,16 @@ For a complete and up-to-date token catalog, see [CSS Variables Reference](./doc
 }
 ```
 
+### Semantic accent token
+
+The link colour follows the `--hub-breadcrumb-accent` token (which itself defaults to the standard link colour). Setting a `variant` re-bases this token; you can also override it directly:
+
+```scss
+.hub-breadcrumb {
+	--hub-breadcrumb-accent: var(--hub-sys-color-info);
+}
+```
+
 ### Bootstrap integration (optional)
 
 ```scss
@@ -337,6 +361,23 @@ For a complete and up-to-date token catalog, see [CSS Variables Reference](./doc
 	--hub-breadcrumb-link-color: var(--bs-primary);
 	--hub-breadcrumb-link-hover-color: var(--bs-primary-text-emphasis);
 	--hub-breadcrumb-item-active-color: var(--bs-secondary-color);
+}
+```
+
+### Theming with the `hub-breadcrumb-theme()` Sass mixin
+
+For a one-call theme that sets surface, spacing, divider, current-item colour, links and accent, use the `hub-breadcrumb-theme()` mixin. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-breadcrumb-*` overrides. It is token-based with no Bootstrap dependency.
+
+```scss
+@use 'ng-hub-ui-breadcrumbs/styles/mixins/breadcrumb-theme' as *;
+
+.docs-breadcrumb {
+	@include hub-breadcrumb-theme(
+		$bg: #f8fafc,
+		$padding-x: 0.75rem,
+		$divider: "'/'", // keep the inner quotes — it feeds CSS `content`
+		$accent: var(--hub-sys-color-info)
+	);
 }
 ```
 

@@ -9,7 +9,10 @@
 	--hub-breadcrumb-divider-color: var(--hub-sys-text-muted, #6c757d);
 	--hub-breadcrumb-item-padding-x: var(--hub-ref-space-1, 0.5rem);
 	--hub-breadcrumb-item-active-color: var(--hub-sys-text-muted, #6c757d);
-	--hub-breadcrumb-link-color: var(--hub-sys-link-color, #0d6efd);
+	// Semantic accent for the links — defaults to the standard link colour, so a
+	// neutral breadcrumb is unchanged. A `variant` re-bases it (see @each below).
+	--hub-breadcrumb-accent: var(--hub-sys-link-color, #0d6efd);
+	--hub-breadcrumb-link-color: var(--hub-breadcrumb-accent);
 	--hub-breadcrumb-link-hover-color: var(--hub-sys-link-hover-color, #0a58ca);
 	--hub-breadcrumb-link-decoration: none;
 	--hub-breadcrumb-link-hover-decoration: underline;
@@ -83,4 +86,18 @@
 
 [dir='rtl'] .hub-breadcrumb__nav .hub-breadcrumb__item + .hub-breadcrumb__item::before {
 	content: var(--hub-breadcrumb-divider-flipped, var(--hub-breadcrumb-divider, '>'));
+}
+
+// ─── Semantic variants ───────────────────────────────────────────────────────
+// Opt-in accent for the links via `<hub-breadcrumb variant="success">`. Each
+// variant re-bases `--hub-breadcrumb-accent` (the link colour) and its hover to
+// the matching design-system family; the current (last) item stays muted. The
+// built-in five are emitted here; any custom variant resolves through the
+// host's inline `--hub-breadcrumb-accent` binding.
+@each $variant in (primary, success, danger, warning, info) {
+	:host([data-variant='#{$variant}']),
+	.hub-breadcrumb[data-variant='#{$variant}'] {
+		--hub-breadcrumb-accent: var(--hub-sys-color-#{$variant});
+		--hub-breadcrumb-link-hover-color: var(--hub-sys-color-#{$variant}-emphasis);
+	}
 }
