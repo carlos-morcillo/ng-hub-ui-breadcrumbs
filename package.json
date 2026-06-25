@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs"
+    "url": "git+https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs.git"
   },
   "bugs": {
     "url": "https://github.com/carlos-morcillo/ng-hub-ui-breadcrumbs/issues"
