@@ -7,7 +7,7 @@
 	--hub-breadcrumb-color: var(--hub-sys-text-primary, #212529);
 	--hub-breadcrumb-border-radius: var(--hub-ref-radius-md, 0.375rem);
 	--hub-breadcrumb-divider-color: var(--hub-sys-text-muted, #6c757d);
-	--hub-breadcrumb-item-padding-x: var(--hub-ref-space-1, 0.5rem);
+	--hub-breadcrumb-item-padding-x: var(--hub-ref-space-1, 0.25rem);
 	--hub-breadcrumb-item-active-color: var(--hub-sys-text-muted, #6c757d);
 	// Semantic accent for the links — defaults to the standard link colour, so a
 	// neutral breadcrumb is unchanged. A `variant` re-bases it (see @each below).
@@ -45,14 +45,14 @@
 		+ .hub-breadcrumb__item {
 			padding-left: var(
 				--hub-breadcrumb-item-padding-x,
-				var(--hub-ref-space-1, 0.5rem)
+				var(--hub-ref-space-1, 0.25rem)
 			);
 
 			&::before {
 				float: left;
 				padding-right: var(
 					--hub-breadcrumb-item-padding-x,
-					var(--hub-ref-space-1, 0.5rem)
+					var(--hub-ref-space-1, 0.25rem)
 				);
 				color: var(
 					--hub-breadcrumb-divider-color,
