@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.1.2] - 2026-06-26
+
+### Fixed
+
+- Corrected the Angular peer dependency range to `>=18.0.0`. The library uses APIs introduced in Angular 17 (signal `input()`/`output()`, the `@if` control flow and/or signal queries), whose real minimum is Angular 17.3, so the previous `>=17.0.0` range was too low and let it install on incompatible versions.
+
 ## [22.1.1] - 2026-06-25
 
 ### Fixed
