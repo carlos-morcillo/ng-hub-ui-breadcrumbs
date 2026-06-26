@@ -9,11 +9,19 @@
 	--hub-breadcrumb-divider-color: var(--hub-sys-text-muted, #6c757d);
 	--hub-breadcrumb-item-padding-x: var(--hub-ref-space-1, 0.25rem);
 	--hub-breadcrumb-item-active-color: var(--hub-sys-text-muted, #6c757d);
-	// Semantic accent for the links — defaults to the standard link colour, so a
-	// neutral breadcrumb is unchanged. A `variant` re-bases it (see @each below).
-	--hub-breadcrumb-accent: var(--hub-sys-link-color, #0d6efd);
+	// Semantic accent for the links — a single slot defaulting to primary (the
+	// standard link colour), so a neutral breadcrumb is unchanged. A `variant`
+	// re-bases this slot (see @each below) and the roles below recompute from it.
+	// The role family is derived LOCALLY from the slot, mirroring the ds engine,
+	// so any accent — a known variant or a custom `brand` — gives a coherent link
+	// colour + hover with no recompilation. `-on` is provided for completeness
+	// (accent-filled surfaces); the link hover uses `-emphasis`.
+	--hub-breadcrumb-accent: var(--hub-sys-color-primary, #0d6efd);
+	--hub-breadcrumb-accent-emphasis: color-mix(in oklch, var(--hub-breadcrumb-accent) 80%, var(--hub-sys-color-ink, #212529));
+	--hub-breadcrumb-accent-subtle: color-mix(in oklch, var(--hub-breadcrumb-accent) 12%, var(--hub-sys-surface-page, #fff));
+	--hub-breadcrumb-accent-on: oklch(from var(--hub-breadcrumb-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
 	--hub-breadcrumb-link-color: var(--hub-breadcrumb-accent);
-	--hub-breadcrumb-link-hover-color: var(--hub-sys-link-hover-color, #0a58ca);
+	--hub-breadcrumb-link-hover-color: var(--hub-breadcrumb-accent-emphasis, var(--hub-sys-link-hover-color, #0a58ca));
 	--hub-breadcrumb-link-decoration: none;
 	--hub-breadcrumb-link-hover-decoration: underline;
 	--hub-breadcrumb-divider: '>';
@@ -88,16 +96,32 @@
 	content: var(--hub-breadcrumb-divider-flipped, var(--hub-breadcrumb-divider, '>'));
 }
 
-// ─── Semantic variants ───────────────────────────────────────────────────────
+// ─── Semantic variants (open set) ────────────────────────────────────────────
 // Opt-in accent for the links via `<hub-breadcrumb variant="success">`. Each
-// variant re-bases `--hub-breadcrumb-accent` (the link colour) and its hover to
-// the matching design-system family; the current (last) item stays muted. The
-// built-in five are emitted here; any custom variant resolves through the
-// host's inline `--hub-breadcrumb-accent` binding.
-@each $variant in (primary, success, danger, warning, info) {
+// known variant re-bases the single `--hub-breadcrumb-accent` slot; the link
+// colour and its hover (derived locally as `-emphasis`) recompute from it, while
+// the current (last) item stays muted. The nine canonical variants are emitted
+// here.
+@each $variant in (primary, secondary, success, danger, warning, info, neutral, light, dark) {
 	:host([data-variant='#{$variant}']),
 	.hub-breadcrumb[data-variant='#{$variant}'] {
 		--hub-breadcrumb-accent: var(--hub-sys-color-#{$variant});
-		--hub-breadcrumb-link-hover-color: var(--hub-sys-color-#{$variant}-emphasis);
 	}
+}
+
+// Open-set escape hatch — any custom accent (e.g. a `brand` the host app adds to
+// the ds `$hub-accents` map) works with ONE CSS rule:
+//
+//   hub-breadcrumb[data-variant='brand'] { --hub-breadcrumb-accent: var(--hub-sys-color-brand); }
+//
+// This bare `[data-variant]` block re-derives the role family (including the link
+// hover via `-emphasis`) from the slot, so a host that sets only
+// `--hub-breadcrumb-accent` still gets a coherent family, with no per-variant
+// boilerplate and no recompilation.
+:host([data-variant]),
+.hub-breadcrumb[data-variant] {
+	--hub-breadcrumb-accent-emphasis: color-mix(in oklch, var(--hub-breadcrumb-accent) 80%, var(--hub-sys-color-ink, #212529));
+	--hub-breadcrumb-accent-subtle: color-mix(in oklch, var(--hub-breadcrumb-accent) 12%, var(--hub-sys-surface-page, #fff));
+	--hub-breadcrumb-accent-on: oklch(from var(--hub-breadcrumb-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
+	--hub-breadcrumb-link-hover-color: var(--hub-breadcrumb-accent-emphasis);
 }

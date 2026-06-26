@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.2.0] - 2026-06-26
+
+### Changed
+
+- **Accent system migrated to the open-set "local accent slot" pattern.** `<hub-breadcrumb variant="…">` now re-bases a single `--hub-breadcrumb-accent` slot (defaulting to `--hub-sys-color-primary`), and the link hover (`--hub-breadcrumb-link-hover-color`) is derived **locally** as `--hub-breadcrumb-accent-emphasis` with `color-mix(in oklch, …)`, mirroring the `ng-hub-ui-ds` engine — instead of reading the per-variant `--hub-sys-color-<variant>-emphasis` token directly. The built-in variant list grew from 5 to the **nine canonical accents** (`primary · secondary · success · danger · warning · info · neutral · light · dark`), and a bare `[data-variant]` block re-derives the family from the slot so **any custom accent** the host app adds to the ds `$hub-accents` map (e.g. `brand`) recolours the links at runtime with one CSS rule — no library recompilation.
+
+### Added
+
+- New tokens `--hub-breadcrumb-accent-emphasis` (link hover), `--hub-breadcrumb-accent-subtle` and `--hub-breadcrumb-accent-on` (contrast colour), all derived locally from the accent slot.
+
 ## [22.1.2] - 2026-06-26
 
 ### Fixed
