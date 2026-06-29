@@ -66,6 +66,7 @@ It supports static labels, dynamic labels resolved from route data (via function
 - **Dynamic Labels**: Supports dynamic labels via functions or string interpolation using resolved data.
 - **Custom Templates**: Full control over how each breadcrumb item is rendered using a structural directive.
 - **RTL Support**: Ships a flipped divider token (`--hub-breadcrumb-divider-flipped`) for Right-to-Left layouts.
+- **Opt-in Truncation + Tooltip**: Set `truncateItems` to clip long labels with an ellipsis (bounded by `--hub-breadcrumb-max-item-width`) and reveal the full text on hover — the native `title` by default, or the richer hub-ui tooltip when wired (see below).
 - **Lazy Loading Compatible**: Works seamlessly with lazy-loaded routes.
 - **Zero Manual Style Import**: Styles are bundled within the component — no separate SCSS import is required.
 
@@ -278,6 +279,7 @@ The main container component. It reads the breadcrumb trail directly from the An
 | Input     | Type     | Default     | Description                                                                                                                                                                                                                                                                                                                  |
 | --------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variant` | `string` | `undefined` | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `success`, `danger`, `warning`, `info`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change). |
+| `truncateItems` | `boolean` | `false` | When `true`, clips each label to `--hub-breadcrumb-max-item-width` (default `12rem`) with an ellipsis and shows the full text as a tooltip when a label overflows. Off by default, so the standard layout and wrapping are unchanged. |
 
 ```html
 <!-- Built-in semantic accent -->
@@ -285,7 +287,28 @@ The main container component. It reads the breadcrumb trail directly from the An
 
 <!-- Custom accent — resolves to var(--hub-sys-color-brand) -->
 <hub-breadcrumb variant="brand"></hub-breadcrumb>
+
+<!-- Clip long labels and reveal the full text on hover -->
+<hub-breadcrumb [truncateItems]="true"></hub-breadcrumb>
 ```
+
+#### Tooltip on truncated labels (optional)
+
+When `truncateItems` is on, a clipped label exposes its full text on hover. By
+default this uses the native browser `title` attribute (zero dependencies). To
+upgrade every truncated label to the richer, themeable hub-ui tooltip, provide an
+adapter once — e.g. the one shipped by `ng-hub-ui-utils`:
+
+```ts
+import { provideHubBreadcrumbTooltip } from 'ng-hub-ui-breadcrumbs';
+import { hubTooltipAdapter } from 'ng-hub-ui-utils';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideHubBreadcrumbTooltip(hubTooltipAdapter)]
+};
+```
+
+Remove the provider and breadcrumbs gracefully fall back to the native tooltip.
 
 It projects a single optional content template via the `hubBreadcrumbItem` directive (read through `contentChild`). When no template is provided, the component renders a default breadcrumb list.
 

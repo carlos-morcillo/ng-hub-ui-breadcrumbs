@@ -12,11 +12,11 @@
 					/>
 				} @else {
 					@if (!last) {
-						<a [routerLink]="item.url" class="hub-breadcrumb__link">
+						<a [routerLink]="item.url" class="hub-breadcrumb__link" hubBreadcrumbLabel>
 							{{ item.label }}
 						</a>
 					} @else {
-						<span class="hub-breadcrumb__text">{{ item.label }}</span>
+						<span class="hub-breadcrumb__text" hubBreadcrumbLabel>{{ item.label }}</span>
 					}
 				}
 			</li>

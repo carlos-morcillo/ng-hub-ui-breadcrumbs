@@ -66,6 +66,7 @@ Admite etiquetas estáticas, etiquetas dinámicas resueltas a partir de los dato
 - **Etiquetas dinámicas**: admite etiquetas dinámicas mediante funciones o interpolación de cadenas usando datos resueltos.
 - **Plantillas personalizadas**: control total sobre cómo se renderiza cada elemento mediante una directiva estructural.
 - **Soporte RTL**: incluye un token de separador invertido (`--hub-breadcrumb-divider-flipped`) para diseños de derecha a izquierda.
+- **Truncado + tooltip (opt-in)**: activa `truncateItems` para recortar etiquetas largas con puntos suspensivos (acotado por `--hub-breadcrumb-max-item-width`) y mostrar el texto completo al pasar el ratón — el `title` nativo por defecto, o el tooltip de hub-ui si se cablea (ver abajo).
 - **Compatible con lazy loading**: funciona sin problemas con rutas cargadas de forma diferida.
 - **Sin importación manual de estilos**: los estilos están incluidos en el componente, no se requiere una importación SCSS aparte.
 
@@ -278,6 +279,7 @@ El componente contenedor principal. Lee la ruta de breadcrumbs directamente del 
 | Input     | Tipo     | Por defecto | Descripción                                                                                                                                                                                                                                                                                                                                       |
 | --------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variant` | `string` | `undefined` | Selecciona un **acento semántico** para los enlaces del breadcrumb y su hover. Los valores integrados (`primary`, `success`, `danger`, `warning`, `info`) mapean a los tintes exactos del sistema de diseño; **también se acepta cualquier otra cadena**, que se resuelve a través de `--hub-sys-color-<variant>`. El elemento actual (el último) permanece siempre atenuado. Si se omite, los enlaces usan el color de enlace estándar (sin cambio visual). |
+| `truncateItems` | `boolean` | `false` | Si es `true`, recorta cada etiqueta a `--hub-breadcrumb-max-item-width` (por defecto `12rem`) con puntos suspensivos y muestra el texto completo como tooltip cuando una etiqueta desborda. Desactivado por defecto, así el layout estándar no cambia. |
 
 ```html
 <!-- Acento semántico integrado -->
@@ -285,7 +287,28 @@ El componente contenedor principal. Lee la ruta de breadcrumbs directamente del 
 
 <!-- Acento personalizado — se resuelve a var(--hub-sys-color-brand) -->
 <hub-breadcrumb variant="brand"></hub-breadcrumb>
+
+<!-- Recorta etiquetas largas y muestra el texto completo al pasar el ratón -->
+<hub-breadcrumb [truncateItems]="true"></hub-breadcrumb>
 ```
+
+#### Tooltip en etiquetas truncadas (opcional)
+
+Con `truncateItems` activo, una etiqueta recortada muestra su texto completo al
+pasar el ratón. Por defecto usa el atributo `title` nativo (cero dependencias).
+Para subir cada etiqueta truncada al tooltip de hub-ui (temable), provee un
+adapter una vez — p.ej. el de `ng-hub-ui-utils`:
+
+```ts
+import { provideHubBreadcrumbTooltip } from 'ng-hub-ui-breadcrumbs';
+import { hubTooltipAdapter } from 'ng-hub-ui-utils';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideHubBreadcrumbTooltip(hubTooltipAdapter)]
+};
+```
+
+Quita el provider y los breadcrumbs vuelven al tooltip nativo.
 
 Proyecta una única plantilla de contenido opcional mediante la directiva `hubBreadcrumbItem` (leída a través de `contentChild`). Cuando no se proporciona ninguna plantilla, el componente renderiza una lista de breadcrumbs por defecto.
 

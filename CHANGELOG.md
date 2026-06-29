@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.3.0] - 2026-06-29
+
+### Added
+
+- **Opt-in per-item truncation** via the new `truncateItems` input on `hub-breadcrumb`. When enabled, each label is clipped to the new `--hub-breadcrumb-max-item-width` CSS variable (default `12rem`) with an ellipsis. Off by default, so the standard layout and wrapping are unchanged.
+- **`HubBreadcrumbLabelDirective`** (`[hubBreadcrumbLabel]`) — surfaces a truncated label's full text as a tooltip only when it actually overflows.
+- **Optional hub-ui tooltip integration** — `HUB_BREADCRUMB_TOOLTIP_ADAPTER` token, `provideHubBreadcrumbTooltip()` provider and the `HubBreadcrumbTooltipAdapter` / `HubBreadcrumbTooltipHandle` contract. By default truncated labels use the native `title` attribute (zero dependencies); provide an adapter (e.g. `hubTooltipAdapter` from `ng-hub-ui-utils`) to upgrade them to the richer, themeable hub-ui tooltip — `provideHubBreadcrumbTooltip(hubTooltipAdapter)`. The native `title` is suppressed when the adapter is active to avoid double tooltips.
+
 ## [22.2.0] - 2026-06-26
 
 ### Changed

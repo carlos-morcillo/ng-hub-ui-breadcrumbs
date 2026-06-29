@@ -72,6 +72,7 @@ Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/brea
 | `--hub-breadcrumb-font-size` | `inherit` |
 | `--hub-breadcrumb-border-radius` | `var(--hub-ref-radius-md, 0.375rem)` |
 | `--hub-breadcrumb-item-padding-x` | `var(--hub-ref-space-1, 0.5rem)` |
+| `--hub-breadcrumb-max-item-width` | `12rem` (max label width when `truncateItems` is on) |
 
 ### Divider
 

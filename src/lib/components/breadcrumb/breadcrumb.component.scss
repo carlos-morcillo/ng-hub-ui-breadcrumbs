@@ -27,6 +27,9 @@
 	--hub-breadcrumb-divider: '>';
 	--hub-breadcrumb-divider-flipped: '<';
 	--hub-breadcrumb-font-size: inherit;
+	// Max width of a single item label when truncation is enabled (opt-in via the
+	// `truncateItems` input / `.hub-breadcrumb--truncate` modifier).
+	--hub-breadcrumb-max-item-width: 12rem;
 }
 
 .hub-breadcrumb__nav {
@@ -94,6 +97,28 @@
 
 [dir='rtl'] .hub-breadcrumb__nav .hub-breadcrumb__item + .hub-breadcrumb__item::before {
 	content: var(--hub-breadcrumb-divider-flipped, var(--hub-breadcrumb-divider, '>'));
+}
+
+// ─── Opt-in per-item truncation ──────────────────────────────────────────────
+// Applied only under `.hub-breadcrumb--truncate` (the `truncateItems` input), so
+// the default breadcrumb layout and wrapping behaviour are untouched. Each label
+// is clipped to `--hub-breadcrumb-max-item-width` with an ellipsis; the
+// `[hubBreadcrumbLabel]` directive surfaces the full text as a tooltip when a
+// label actually overflows.
+// `:host(...)` matches the host modifier under emulated encapsulation; the bare
+// `.hub-breadcrumb--truncate` form covers non-encapsulated/global usage (mirrors
+// the `[data-variant]` dual selectors above).
+:host(.hub-breadcrumb--truncate) .hub-breadcrumb__nav,
+.hub-breadcrumb--truncate .hub-breadcrumb__nav {
+	.hub-breadcrumb__link,
+	.hub-breadcrumb__text {
+		display: inline-block;
+		max-inline-size: var(--hub-breadcrumb-max-item-width, 12rem);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		vertical-align: bottom;
+	}
 }
 
 // ─── Semantic variants (open set) ────────────────────────────────────────────
