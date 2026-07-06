@@ -71,7 +71,7 @@ Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/brea
 | `--hub-breadcrumb-color` | `var(--hub-sys-text-primary, #212529)` |
 | `--hub-breadcrumb-font-size` | `inherit` |
 | `--hub-breadcrumb-border-radius` | `var(--hub-ref-radius-md, 0.375rem)` |
-| `--hub-breadcrumb-item-padding-x` | `var(--hub-ref-space-1, 0.5rem)` |
+| `--hub-breadcrumb-item-padding-x` | `var(--hub-ref-space-1, 0.25rem)` |
 | `--hub-breadcrumb-max-item-width` | `12rem` (max label width when `truncateItems` is on) |
 
 ### Divider
@@ -87,9 +87,9 @@ Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/brea
 | Variable | Default |
 |---|---|
 | `--hub-breadcrumb-item-active-color` | `var(--hub-sys-text-muted, #6c757d)` |
-| `--hub-breadcrumb-accent` | `var(--hub-sys-link-color, #0d6efd)` |
+| `--hub-breadcrumb-accent` | `var(--hub-sys-color-primary, #0d6efd)` |
 | `--hub-breadcrumb-link-color` | `var(--hub-breadcrumb-accent)` |
-| `--hub-breadcrumb-link-hover-color` | `var(--hub-sys-link-hover-color, #0a58ca)` |
+| `--hub-breadcrumb-link-hover-color` | `var(--hub-breadcrumb-accent-emphasis, var(--hub-sys-link-hover-color, #0a58ca))` |
 | `--hub-breadcrumb-link-decoration` | `none` |
 | `--hub-breadcrumb-link-hover-decoration` | `underline` |
 

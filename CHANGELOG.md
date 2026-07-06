@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.3.1] - 2026-07-06
+
+### Fixed
+
+- Docs: `docs/css-variables-reference.md` default values resynchronized with the actual code declarations (`--hub-breadcrumb-item-padding-x`, `--hub-breadcrumb-accent`, `--hub-breadcrumb-link-hover-color`), now guarded by the repo-level `tokens-parity` check F.
+
 ## [22.3.0] - 2026-06-29
 
 ### Added
