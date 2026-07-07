@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.4.0] - 2026-07-07
+
+### Changed
+
+- **BREAKING (packaging) — SCSS ships at `ng-hub-ui-breadcrumbs/styles`.** The theme mixin now builds to `dist/breadcrumbs/styles/...` (was `dist/breadcrumbs/src/lib/styles/...`), so `@use 'ng-hub-ui-breadcrumbs/styles'` resolves. Update any `@use` that reached into `src/lib/styles`.
+
 ## [22.3.1] - 2026-07-06
 
 ### Fixed

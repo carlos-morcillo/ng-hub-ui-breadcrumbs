@@ -2,6 +2,14 @@
 
 This version introduces structural changes to improve consistency across the `ng-hub-ui` library family.
 
+## [22.4.0] - 2026-07-07
+
+### SCSS ships at `ng-hub-ui-breadcrumbs/styles` (packaging path)
+
+- **Change**: the theming mixin now builds to `dist/breadcrumbs/styles/...` instead of `dist/breadcrumbs/src/lib/styles/...`, and a `styles/index.scss` root entry forwards it.
+- **Impact**: a `@use` that reached into the old `src/lib/styles/...` path no longer resolves.
+- **Migration**: `@use 'ng-hub-ui-breadcrumbs/styles' as *;`
+
 ## Component Renaming
 
 The main component has been renamed for better alignment with Angular best practices and other components in the library.

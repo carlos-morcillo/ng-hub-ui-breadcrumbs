@@ -1,0 +1,10 @@
+// ─────────────────────────────────────────────────────────────────────────
+// ng-hub-ui-breadcrumbs — theming entry
+// ─────────────────────────────────────────────────────────────────────────
+// Opt-in one-call theming mixin, forwarded so consumers can `@use` it from the
+// package root:
+//
+//   @use 'ng-hub-ui-breadcrumbs/styles' as *;
+// ─────────────────────────────────────────────────────────────────────────
+
+@forward 'mixins/breadcrumb-theme';
