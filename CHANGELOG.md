@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.4.1] - 2026-07-28
+
+### Fixed
+
+- The active (last) crumb now declares `aria-current="page"`, so assistive technology announces which entry represents the current page. The `<nav aria-label="breadcrumb">` landmark was already in place.
+
 ## [22.4.0] - 2026-07-07
 
 ### Changed

@@ -1,6 +1,6 @@
 {
   "name": "ng-hub-ui-breadcrumbs",
-  "version": "22.4.0",
+  "version": "22.4.1",
   "description": "A flexible and reusable breadcrumb component for Angular applications that automatically generates breadcrumbs based on routing configuration",
   "keywords": [
     "angular",
