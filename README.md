@@ -9,11 +9,11 @@ A flexible and reusable breadcrumb component for Angular applications that autom
 
 ## Documentation and Live Examples
 
-This package is part of [Hub UI](https://hubui.dev/), a collection of Angular component libraries for standalone apps.
+This package is part of [Hub UI](https://hubui.dev/en/), a collection of Angular component libraries for standalone apps.
 
-- Docs: https://hubui.dev/breadcrumbs/overview/
-- Live examples: https://hubui.dev/breadcrumbs/examples/
-- Hub UI: https://hubui.dev/
+- Docs: https://hubui.dev/en/breadcrumbs/overview/
+- Live examples: https://hubui.dev/en/breadcrumbs/examples/
+- Hub UI: https://hubui.dev/en/
 
 ## 🧩 Library Family `ng-hub-ui`
 
