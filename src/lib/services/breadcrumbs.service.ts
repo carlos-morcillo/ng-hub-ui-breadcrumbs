@@ -16,11 +16,7 @@ export class HubBreadcrumbsService {
 		map(() => this.createBreadcrumbs(this.#activatedRoute.root))
 	);
 
-	private createBreadcrumbs(
-		route: ActivatedRoute,
-		url: string = '',
-		breadcrumbs: BreadcrumbItem[] = []
-	): BreadcrumbItem[] {
+	private createBreadcrumbs(route: ActivatedRoute, url: string = '', breadcrumbs: BreadcrumbItem[] = []): BreadcrumbItem[] {
 		const children: ActivatedRoute[] = route.children;
 
 		if (children.length === 0) {
@@ -31,9 +27,7 @@ export class HubBreadcrumbsService {
 			const routeSegments = child.snapshot.url;
 
 			// Construir la URL para este nivel
-			const routeURL: string = routeSegments
-				.map((segment) => segment.path)
-				.join('/');
+			const routeURL: string = routeSegments.map((segment) => segment.path).join('/');
 
 			const nextUrl = routeURL ? `${url}/${routeURL}` : url;
 
@@ -59,11 +53,7 @@ export class HubBreadcrumbsService {
 	private hasOwnBreadcrumbData(route: ActivatedRoute): boolean {
 		// Verificar si la ruta tiene su propia configuración de breadcrumb
 		const routeConfig = route.routeConfig;
-		return !!(
-			routeConfig &&
-			routeConfig.data &&
-			routeConfig.data['breadcrumb']
-		);
+		return !!(routeConfig && routeConfig.data && routeConfig.data['breadcrumb']);
 	}
 
 	private getBreadcrumbLabel(route: ActivatedRoute): string {
