@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.5.0] - 2026-08-29
+
+### Added
+
+- **Collapsing for long trails.** `maxItems` folds the middle of the trail behind an indicator; `itemsBeforeCollapse` (default `1`) and `itemsAfterCollapse` (default `1`) decide how many crumbs survive at each end. The indicator is a real `<button>`: it takes keyboard focus, carries the accessible name given by the new `collapsedAriaLabel` input, opens the trail in place, and emits the new `collapsedClick` output. An expansion answers one trail — the next navigation collapses it again. Undefined `maxItems` (the default) never collapses, so nothing changes for existing consumers.
+- **Crumbs whose destination is not an Angular route.** `BreadcrumbItem` accepts `href`, `target`, `rel` and `download`; a crumb carrying `href` renders a plain anchor instead of a `routerLink`. A `_blank` crumb with no `rel` of its own gets `rel="noopener noreferrer"`, so the destination never inherits a handle on the opener.
+- **Two ways in for those crumbs.** A route may declare the object form `data: { breadcrumb: { label, href, target, rel, download } }` (the string and function forms are untouched), and the new `items` input takes over the whole trail when the route tree cannot express it — an ancestor served by another application, or a trail assembled by hand. Left `null`, the component keeps reading `HubBreadcrumbsService`.
+- **Keyboard focus ring** on the links and on the collapsed indicator, built on the design-system focus tokens and exposed as `--hub-breadcrumb-link-focus-color`, `--hub-breadcrumb-focus-bg` and `--hub-breadcrumb-focus-ring-width` / `-color` / `-radius`. The outline is traded for the ring, never simply removed. Until now the component styled `:hover` only and left keyboard focus to whatever the host page happened to apply.
+- **Collapsed indicator tokens**: `--hub-breadcrumb-collapsed-color`, `--hub-breadcrumb-collapsed-hover-color`, `--hub-breadcrumb-collapsed-bg` and `--hub-breadcrumb-collapsed-hover-bg`.
+
+### Changed
+
+- `BreadcrumbItem` and `BreadcrumbTemplateContext` are now exported from the public API. Consumers of the new `items` input need the type, and reaching into `ng-hub-ui-breadcrumbs/src/lib/models/...` was the only way to get it before.
+- `BreadcrumbItem.data` is now optional, so a hand-written trail no longer has to carry `data: {}` on every crumb. The service still fills it with the route's data.
+
+### Fixed
+
+- **The separator sat on the wrong side of every crumb under `dir="rtl"`.** It was floated to the physical left, so in a right-to-left trail it hung off the wrong edge: the first and second crumbs ran together with no separator between them, and a stray one dangled past the last. The pseudo-element is now inline and spaced with logical padding, which puts it on the side the trail comes from in both directions.
+- **The README's theming snippet documented a selector that does not win.** The component declares its token defaults on `:host`, so a bare `.hub-breadcrumb { --hub-breadcrumb-accent: … }` rule in an application stylesheet ties on specificity and loses on source order — and a token set on an ancestor element never reaches the component at all. Measured in the browser and corrected: the accent has to be set on the crumb element itself with a selector that outranks `:host` (or inline), while the tokens the stylesheet reads directly — the focus ring, the collapsed indicator — can also be set on `.hub-breadcrumb__list`.
+
 ## [22.4.3] - 2026-08-17
 
 ### Fixed
