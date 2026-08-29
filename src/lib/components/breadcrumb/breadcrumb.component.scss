@@ -24,6 +24,19 @@
 	--hub-breadcrumb-link-hover-color: var(--hub-breadcrumb-accent-emphasis, var(--hub-sys-link-hover-color, #0a58ca));
 	--hub-breadcrumb-link-decoration: none;
 	--hub-breadcrumb-link-hover-decoration: underline;
+	// Keyboard focus. The ring is the design-system one, so a breadcrumb focus
+	// looks like every other focus in the app; the colour follows the accent slot
+	// like the hover does, and the radius is what rounds the ring, not the link.
+	--hub-breadcrumb-link-focus-color: var(--hub-breadcrumb-accent-emphasis);
+	--hub-breadcrumb-focus-bg: transparent;
+	--hub-breadcrumb-focus-ring-width: var(--hub-sys-focus-ring-width, 0.25rem);
+	--hub-breadcrumb-focus-ring-color: var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25));
+	--hub-breadcrumb-focus-ring-radius: var(--hub-ref-radius-sm, 0.25rem);
+	// Collapsed indicator (the `…` button shown when `maxItems` folds the trail).
+	--hub-breadcrumb-collapsed-color: var(--hub-sys-text-muted, #6c757d);
+	--hub-breadcrumb-collapsed-hover-color: var(--hub-breadcrumb-accent);
+	--hub-breadcrumb-collapsed-bg: transparent;
+	--hub-breadcrumb-collapsed-hover-bg: var(--hub-breadcrumb-accent-subtle);
 	--hub-breadcrumb-divider: '>';
 	--hub-breadcrumb-divider-flipped: '<';
 	--hub-breadcrumb-font-size: inherit;
@@ -46,12 +59,15 @@
 	}
 
 	.hub-breadcrumb__item {
+		// The separator belongs to the item that follows it, and must sit on the side
+		// the trail comes from. Logical padding and an inline (unfloated) pseudo put
+		// it there in both directions: a float would pin it to the physical left and,
+		// under `dir="rtl"`, hang it off the wrong edge of every crumb.
 		+ .hub-breadcrumb__item {
-			padding-left: var(--hub-breadcrumb-item-padding-x, var(--hub-ref-space-1, 0.25rem));
+			padding-inline-start: var(--hub-breadcrumb-item-padding-x, var(--hub-ref-space-1, 0.25rem));
 
 			&::before {
-				float: left;
-				padding-right: var(--hub-breadcrumb-item-padding-x, var(--hub-ref-space-1, 0.25rem));
+				padding-inline-end: var(--hub-breadcrumb-item-padding-x, var(--hub-ref-space-1, 0.25rem));
 				color: var(--hub-breadcrumb-divider-color, var(--hub-sys-text-muted, #6c757d));
 				content: var(--hub-breadcrumb-divider, '>');
 			}
@@ -70,6 +86,39 @@
 			color: var(--hub-breadcrumb-link-hover-color, var(--hub-sys-link-hover-color, #0a58ca));
 			text-decoration: var(--hub-breadcrumb-link-hover-decoration, underline);
 		}
+	}
+
+	.hub-breadcrumb__collapsed {
+		display: inline-flex;
+		align-items: center;
+		// Just enough inline padding for the hover chip to breathe. The item already
+		// carries the spacing a crumb gets, so anything wider makes the indicator sit
+		// further from its separators than every other crumb does.
+		padding: 0 0.125rem;
+		border: 0;
+		border-radius: var(--hub-breadcrumb-focus-ring-radius, var(--hub-ref-radius-sm, 0.25rem));
+		background-color: var(--hub-breadcrumb-collapsed-bg, transparent);
+		color: var(--hub-breadcrumb-collapsed-color, var(--hub-sys-text-muted, #6c757d));
+		font: inherit;
+		line-height: inherit;
+		cursor: pointer;
+
+		&:hover {
+			background-color: var(--hub-breadcrumb-collapsed-hover-bg);
+			color: var(--hub-breadcrumb-collapsed-hover-color);
+		}
+	}
+
+	// Keyboard focus, on both the links and the collapsed indicator. The outline is
+	// traded for a tokenized ring, never simply removed.
+	.hub-breadcrumb__link:focus-visible,
+	.hub-breadcrumb__collapsed:focus-visible {
+		outline: 0;
+		border-radius: var(--hub-breadcrumb-focus-ring-radius, var(--hub-ref-radius-sm, 0.25rem));
+		background-color: var(--hub-breadcrumb-focus-bg, transparent);
+		color: var(--hub-breadcrumb-link-focus-color);
+		box-shadow: 0 0 0 var(--hub-breadcrumb-focus-ring-width, var(--hub-sys-focus-ring-width, 0.25rem))
+			var(--hub-breadcrumb-focus-ring-color, var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25)));
 	}
 }
 

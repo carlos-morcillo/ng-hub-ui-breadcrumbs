@@ -1,25 +1,48 @@
 <nav aria-label="breadcrumb" class="hub-breadcrumb__nav">
 	<ol class="hub-breadcrumb__list">
-		@for (item of breadcrumbs$ | async; track item; let last = $last) {
-			<li class="hub-breadcrumb__item" [class.hub-breadcrumb__item--active]="last">
-				@if (itemTemplate()) {
-					<ng-container
-						[ngTemplateOutlet]="itemTemplate()"
-						[ngTemplateOutletContext]="{
-							$implicit: item,
-							isLast: last
-						}"
-					/>
-				} @else {
-					@if (!last) {
-						<a [routerLink]="item.url" class="hub-breadcrumb__link" hubBreadcrumbLabel>
+		@for (row of rows(); track $index) {
+			@if (row.item; as item) {
+				<li class="hub-breadcrumb__item" [class.hub-breadcrumb__item--active]="row.isLast">
+					@if (itemTemplate(); as template) {
+						<ng-container
+							[ngTemplateOutlet]="template"
+							[ngTemplateOutletContext]="{
+								$implicit: item,
+								isLast: row.isLast
+							}"
+						/>
+					} @else if (row.isLast) {
+						<span class="hub-breadcrumb__text" hubBreadcrumbLabel aria-current="page">{{ item.label }}</span>
+					} @else if (item.href) {
+						<a
+							class="hub-breadcrumb__link"
+							hubBreadcrumbLabel
+							[href]="item.href"
+							[attr.target]="item.target ?? null"
+							[attr.rel]="row.rel"
+							[attr.download]="item.download ?? null"
+						>
 							{{ item.label }}
 						</a>
 					} @else {
-						<span class="hub-breadcrumb__text" hubBreadcrumbLabel aria-current="page">{{ item.label }}</span>
+						<a [routerLink]="item.url" class="hub-breadcrumb__link" hubBreadcrumbLabel>
+							{{ item.label }}
+						</a>
 					}
-				}
-			</li>
+				</li>
+			} @else {
+				<li class="hub-breadcrumb__item hub-breadcrumb__item--collapsed">
+					<button
+						type="button"
+						class="hub-breadcrumb__collapsed"
+						[attr.aria-label]="collapsedAriaLabel()"
+						[attr.aria-expanded]="expanded()"
+						(click)="expand()"
+					>
+						&hellip;
+					</button>
+				</li>
+			}
 		}
 	</ol>
 </nav>

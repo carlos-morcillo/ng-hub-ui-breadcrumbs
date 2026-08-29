@@ -92,6 +92,24 @@ Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/brea
 | `--hub-breadcrumb-link-hover-color` | `var(--hub-breadcrumb-accent-emphasis, var(--hub-sys-link-hover-color, #0a58ca))` |
 | `--hub-breadcrumb-link-decoration` | `none` |
 | `--hub-breadcrumb-link-hover-decoration` | `underline` |
+| `--hub-breadcrumb-link-focus-color` | `var(--hub-breadcrumb-accent-emphasis)` |
+| `--hub-breadcrumb-focus-bg` | `transparent` |
+| `--hub-breadcrumb-focus-ring-width` | `var(--hub-sys-focus-ring-width, 0.25rem)` |
+| `--hub-breadcrumb-focus-ring-color` | `var(--hub-sys-focus-ring-color, rgba(13, 110, 253, 0.25))` |
+| `--hub-breadcrumb-focus-ring-radius` | `var(--hub-ref-radius-sm, 0.25rem)` |
+
+> The focus variables dress `:focus-visible` on the links and on the collapsed indicator. The outline is traded for the tokenized ring, never simply removed.
+
+### Collapsed Indicator
+
+Shown only when `maxItems` folds the trail.
+
+| Variable | Default |
+|---|---|
+| `--hub-breadcrumb-collapsed-color` | `var(--hub-sys-text-muted, #6c757d)` |
+| `--hub-breadcrumb-collapsed-hover-color` | `var(--hub-breadcrumb-accent)` |
+| `--hub-breadcrumb-collapsed-bg` | `transparent` |
+| `--hub-breadcrumb-collapsed-hover-bg` | `var(--hub-breadcrumb-accent-subtle)` |
 
 > `--hub-breadcrumb-accent` is the semantic accent that drives the link colour. Setting a `variant` on `<hub-breadcrumb>` (e.g. `variant="success"`) re-bases it to the matching design-system family; you can also override it directly.
 

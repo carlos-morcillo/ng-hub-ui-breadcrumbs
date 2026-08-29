@@ -67,6 +67,9 @@ It supports static labels, dynamic labels resolved from route data (via function
 - **Custom Templates**: Full control over how each breadcrumb item is rendered using a structural directive.
 - **RTL Support**: Ships a flipped divider token (`--hub-breadcrumb-divider-flipped`) for Right-to-Left layouts.
 - **Opt-in Truncation + Tooltip**: Set `truncateItems` to clip long labels with an ellipsis (bounded by `--hub-breadcrumb-max-item-width`) and reveal the full text on hover — the native `title` by default, or the richer hub-ui tooltip when wired (see below).
+- **Collapsing for Long Trails**: `maxItems` folds the middle behind a `…` button that expands the trail in place, keeping `itemsBeforeCollapse` / `itemsAfterCollapse` crumbs at each end.
+- **Destinations Beyond the Router**: A crumb may carry `href`, `target`, `rel` and `download` and render a plain anchor — for ancestors served outside the Angular application, or a file to download.
+- **Keyboard Focus Ring**: Links and the collapsed indicator take the design-system focus ring, re-tintable through `--hub-breadcrumb-focus-*`.
 - **Lazy Loading Compatible**: Works seamlessly with lazy-loaded routes.
 - **Zero Manual Style Import**: Styles are bundled within the component — no separate SCSS import is required.
 
@@ -280,6 +283,17 @@ The main container component. It reads the breadcrumb trail directly from the An
 | --------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `variant` | `string` | `undefined` | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `success`, `danger`, `warning`, `info`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change). |
 | `truncateItems` | `boolean` | `false` | When `true`, clips each label to `--hub-breadcrumb-max-item-width` (default `12rem`) with an ellipsis and shows the full text as a tooltip when a label overflows. Off by default, so the standard layout and wrapping are unchanged. |
+| `items` | `BreadcrumbItem[] \| null` | `null` | Trail supplied by you, replacing the one derived from the router. The way in for crumbs the route tree cannot express — an ancestor served by another application, or a trail assembled by hand. Left `null`, the component keeps reading `HubBreadcrumbsService`. |
+| `maxItems` | `number \| undefined` | `undefined` | Length above which the trail collapses behind an indicator. Undefined never collapses, however long the trail grows. |
+| `itemsBeforeCollapse` | `number` | `1` | Crumbs kept at the head of a collapsed trail. |
+| `itemsAfterCollapse` | `number` | `1` | Crumbs kept at the tail of a collapsed trail, the current page included. |
+| `collapsedAriaLabel` | `string` | `'Show the hidden breadcrumb items'` | Accessible name of the collapsed indicator. It is an input because it is the one string this component announces, and the library carries no translations of its own. |
+
+#### Outputs
+
+| Output | Type | Description |
+| ------ | ---- | ----------- |
+| `collapsedClick` | `void` | Fires when the collapsed indicator is activated. The trail expands on its own; the event is there for consumers that want to react as well — open a menu of the hidden crumbs, log the interaction. |
 
 ```html
 <!-- Built-in semantic accent -->
@@ -290,7 +304,56 @@ The main container component. It reads the breadcrumb trail directly from the An
 
 <!-- Clip long labels and reveal the full text on hover -->
 <hub-breadcrumb [truncateItems]="true"></hub-breadcrumb>
+
+<!-- Fold a deep trail: first crumb, indicator, last crumb -->
+<hub-breadcrumb [maxItems]="4"></hub-breadcrumb>
+
+<!-- Keep two ancestors and the last two crumbs -->
+<hub-breadcrumb [maxItems]="4" [itemsBeforeCollapse]="2" [itemsAfterCollapse]="2"></hub-breadcrumb>
 ```
+
+#### Collapsing long trails
+
+Above `maxItems` crumbs the middle folds behind a `…` button. The button takes
+keyboard focus, announces itself with `collapsedAriaLabel`, opens the trail in
+place and emits `collapsedClick`. An expansion answers one trail: the next
+navigation collapses it again.
+
+#### Crumbs that leave the application
+
+A crumb carrying `href` renders a plain anchor instead of a `routerLink`, with
+`target`, `rel` and `download` passed through. A `_blank` crumb with no `rel` of
+its own gets `rel="noopener noreferrer"`, so the destination never inherits a
+handle on the opener.
+
+Either declare it on the route:
+
+```ts
+{
+  path: 'invoices',
+  component: InvoicesComponent,
+  data: {
+    breadcrumb: { label: 'Invoices', href: 'https://legacy.example.com/invoices', target: '_blank' }
+  }
+}
+```
+
+…or hand the whole trail over, when the route tree cannot express it:
+
+```ts
+readonly trail: BreadcrumbItem[] = [
+  { label: 'Example.com', url: '/', href: 'https://example.com', target: '_blank' },
+  { label: 'Handbook', url: '/handbook', href: '/assets/handbook.pdf', download: 'handbook.pdf' },
+  { label: 'Docs', url: '/docs' },
+  { label: 'Breadcrumbs', url: '/docs/breadcrumbs' }
+];
+```
+
+```html
+<hub-breadcrumb [items]="trail"></hub-breadcrumb>
+```
+
+The last crumb is never a link, whatever it declares: it is the current page.
 
 #### Tooltip on truncated labels (optional)
 
@@ -339,8 +402,24 @@ An optional `NgModule` that imports and exports `HubBreadcrumbComponent` and `Hu
 | Property | Type     | Description                                              |
 | -------- | -------- | -------------------------------------------------------- |
 | `label`  | `string` | The resolved text to display for the breadcrumb.         |
-| `url`    | `string` | The full URL path to navigate to.                        |
-| `data`   | `any`    | The original route data object (useful for icons, etc.). |
+| `url`    | `string` | The in-app destination, handed to `routerLink`.          |
+| `data`   | `any`    | Optional. The original route data object (useful for icons, etc.). |
+| `href`   | `string` | Optional. External destination. When present the crumb renders a plain anchor instead of a `routerLink`. |
+| `target` | `string` | Optional. Anchor `target` (e.g. `_blank`). Only meaningful alongside `href`. |
+| `rel`    | `string` | Optional. Anchor `rel`. Left unset, a `_blank` crumb still gets `noopener noreferrer`. |
+| `download` | `string` | Optional. Anchor `download`: the crumb points at a file to save instead of a page to open. |
+
+#### BreadcrumbRouteConfig
+
+The object form accepted by a route's `data.breadcrumb`, for crumbs whose destination lies outside the router. The string and function forms stay valid and remain the right choice for an ordinary in-app crumb.
+
+| Property   | Type                                  | Description                                                    |
+| ---------- | ------------------------------------- | -------------------------------------------------------------- |
+| `label`    | `string \| ((data: any) => string)`   | Static label, or a function receiving the route's resolved `data`. |
+| `href`     | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
+| `target`   | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
+| `rel`      | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
+| `download` | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
 
 #### BreadcrumbTemplateContext
 
@@ -371,8 +450,34 @@ For a complete and up-to-date token catalog, see [CSS Variables Reference](./doc
 The link colour follows the `--hub-breadcrumb-accent` token (which itself defaults to the standard link colour). Setting a `variant` re-bases this token; you can also override it directly:
 
 ```scss
-.hub-breadcrumb {
+/* The accent is read on the crumb element itself (the link colour and its hover are
+   derived there), so the override must land on that element and must outrank the
+   component's own `:host` defaults — a bare `.hub-breadcrumb` rule ties on specificity
+   and loses on source order. Scope it, or set it inline. */
+.my-page .hub-breadcrumb {
 	--hub-breadcrumb-accent: var(--hub-sys-color-info);
+}
+```
+
+### Focus ring and collapsed indicator
+
+Keyboard focus is drawn with the design-system ring, so a breadcrumb focus looks like focus everywhere else in the application. Re-tint it without touching the outline:
+
+```scss
+/* The component declares its defaults on :host, so an override has to land on the
+   crumb element itself or inside it — a token set on an ancestor never reaches it. */
+.hub-breadcrumb__list {
+	--hub-breadcrumb-focus-ring-color: rgba(25, 135, 84, 0.35);
+	--hub-breadcrumb-focus-ring-width: 0.25rem;
+	--hub-breadcrumb-focus-ring-radius: 0.25rem;
+	--hub-breadcrumb-link-focus-color: #146c43;
+	--hub-breadcrumb-focus-bg: rgba(25, 135, 84, 0.08);
+
+	/* The `…` button shown when `maxItems` folds the trail */
+	--hub-breadcrumb-collapsed-color: #6c757d;
+	--hub-breadcrumb-collapsed-hover-color: #146c43;
+	--hub-breadcrumb-collapsed-bg: transparent;
+	--hub-breadcrumb-collapsed-hover-bg: rgba(25, 135, 84, 0.08);
 }
 ```
 
