@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.5.2] - 2026-09-02
+
+### Fixed
+
+- **A breadcrumb asked for before the first navigation no longer throws.**
+
+    `breadcrumbs$` opens with `startWith(undefined)`, so the route tree is walked the moment
+    anything subscribes — and a page shell that draws its breadcrumb on the first paint
+    subscribes while the initial navigation is still in flight. An `ActivatedRoute` carries
+    `_futureSnapshot` from the moment it is recognised and `snapshot` only once it is
+    activated, so in that window a child exists with no snapshot and `child.snapshot.url`
+    threw.
+
+    It did not fail quietly: the exception escaped into the subscription that draws the
+    shell, so what a consumer saw was not a missing breadcrumb but the whole header gone,
+    with `TypeError: Cannot read properties of undefined (reading 'url')` repeated per load
+    and nothing in it naming this service.
+
+    Present in **every release from 21.0.0 onwards**, not only in the two it was observed on:
+    `startWith(undefined)` and the unguarded `child.snapshot.url` are both already in
+    `v21.0.0`, byte for byte. Whether it surfaces depends on how early the consumer
+    subscribes, which is why it went so long unreported — but a reader on 22.4 or on 21.x is
+    affected and should not conclude otherwise from where it happened to be measured.
+
+    A route with no snapshot is skipped rather than guessed at: it has no segments and no
+    resolved data, so there is nothing to name yet.
+
 ## [22.5.1] - 2026-09-01
 
 ### Changed
@@ -105,7 +132,6 @@ All notable changes to this project will be documented in this file.
 
 - Aligned with Angular 22.
 - README documentation standardized.
-
 
 ## [21.1.0] - 2026-03-17
 

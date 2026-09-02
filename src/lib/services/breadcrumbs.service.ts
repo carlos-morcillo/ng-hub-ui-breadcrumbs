@@ -24,6 +24,17 @@ export class HubBreadcrumbsService {
 		}
 
 		for (const child of children) {
+			// A route is recognised before it is activated, and carries `_futureSnapshot`
+			// in between while `snapshot` is still unset. `breadcrumbs$` opens with
+			// `startWith(undefined)`, so a shell that draws its breadcrumb on the first
+			// paint walks the tree inside that window — and reading `.url` there threw,
+			// out of a subscription that draws the whole page header, taking the header
+			// with it. There is nothing to name yet either: a route with no snapshot has
+			// no segments and no resolved data, so it is skipped rather than guessed at.
+			if (!child.snapshot) {
+				continue;
+			}
+
 			const routeSegments = child.snapshot.url;
 
 			// URL of this level
