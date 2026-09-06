@@ -74,6 +74,20 @@ describe('HubBreadcrumbsService', () => {
 		expect(latest.map((item) => item.url)).toEqual(['/docs', '/docs/reports']);
 	});
 
+	/**
+	 * The signal is the surface a consumer reads from a component, and it must answer with
+	 * the trail of the navigation that just finished — not one behind it.
+	 */
+	it('publishes the current trail as a signal', async () => {
+		expect(service.breadcrumbs()).toEqual([]);
+
+		await harness.navigateByUrl('/docs/reports');
+		expect(service.breadcrumbs().map((item) => item.label)).toEqual(['Docs', 'Reports (monthly)']);
+
+		await harness.navigateByUrl('/docs/handbook');
+		expect(service.breadcrumbs().map((item) => item.label)).toEqual(['Docs', 'Handbook']);
+	});
+
 	it('interpolates {key} placeholders from the resolved data', async () => {
 		await harness.navigateByUrl('/docs/products/42');
 

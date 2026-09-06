@@ -1,18 +1,38 @@
+import { ApplicationRef, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { HubBreadcrumbItemDirective } from '../../directives/breadcrumb-item.directive';
 import { BreadcrumbItem } from '../../models/breadcrumb-item';
 import { HubBreadcrumbsService } from '../../services/breadcrumbs.service';
 import { HubBreadcrumbComponent } from './breadcrumb.component';
 
-/** Router-free stand-in so specs drive the trail directly. */
+/**
+ * Router-free stand-in so specs drive the trail directly. It publishes the signal
+ * and nothing else — the component must read the service the way the service now
+ * offers itself, without a stream to wrap.
+ */
 class FakeBreadcrumbsService {
-	readonly source = new BehaviorSubject<BreadcrumbItem[]>([]);
-	readonly breadcrumbs$ = this.source.asObservable();
+	readonly source = signal<BreadcrumbItem[]>([]);
+	readonly breadcrumbs = this.source.asReadonly();
 }
 
 const trail = (...labels: string[]): BreadcrumbItem[] => labels.map((label) => ({ label, url: `/${label.toLowerCase()}` }));
+
+/** Consumer taking over the markup, the way `hubBreadcrumbItem` is meant to be used. */
+@Component({
+	imports: [HubBreadcrumbComponent, HubBreadcrumbItemDirective],
+	template: `
+		<hub-breadcrumb [items]="items">
+			<ng-template hubBreadcrumbItem let-item>
+				<span class="custom-crumb">{{ item.label }}</span>
+			</ng-template>
+		</hub-breadcrumb>
+	`
+})
+class CustomTemplateHostComponent {
+	readonly items = trail('Home', 'Products', 'Detail');
+}
 
 describe('HubBreadcrumbComponent', () => {
 	let component: HubBreadcrumbComponent;
@@ -43,8 +63,17 @@ describe('HubBreadcrumbComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
+	/**
+	 * The trail had two public surfaces on the component: the signal it renders from and a
+	 * re-exported `breadcrumbs$`. The second is gone, so there is one place to read it — and
+	 * a fake service like the one above no longer has to publish a stream nobody consumes.
+	 */
+	it('does not re-export the service stream', () => {
+		expect((component as unknown as Record<string, unknown>)['breadcrumbs$']).toBeUndefined();
+	});
+
 	it('renders the trail published by the service', () => {
-		service.source.next(trail('Home', 'Products', 'Detail'));
+		service.source.set(trail('Home', 'Products', 'Detail'));
 		fixture.detectChanges();
 
 		expect(labels()).toEqual(['Home', 'Products', 'Detail']);
@@ -52,7 +81,7 @@ describe('HubBreadcrumbComponent', () => {
 
 	describe('manual items', () => {
 		it('replaces the router trail when [items] is set', () => {
-			service.source.next(trail('Home', 'Products'));
+			service.source.set(trail('Home', 'Products'));
 			fixture.componentRef.setInput('items', trail('Docs', 'Guides', 'Install'));
 			fixture.detectChanges();
 
@@ -60,7 +89,7 @@ describe('HubBreadcrumbComponent', () => {
 		});
 
 		it('falls back to the router trail when [items] is null', () => {
-			service.source.next(trail('Home', 'Products'));
+			service.source.set(trail('Home', 'Products'));
 			fixture.componentRef.setInput('items', null);
 			fixture.detectChanges();
 
@@ -70,7 +99,7 @@ describe('HubBreadcrumbComponent', () => {
 
 	describe('collapsing', () => {
 		beforeEach(() => {
-			service.source.next(trail('One', 'Two', 'Three', 'Four', 'Five', 'Six'));
+			service.source.set(trail('One', 'Two', 'Three', 'Four', 'Five', 'Six'));
 		});
 
 		it('shows every crumb when maxItems is not set', () => {
@@ -142,17 +171,67 @@ describe('HubBreadcrumbComponent', () => {
 			expect(indicator()).toBeNull();
 		});
 
+		it('hands focus to the first revealed crumb instead of dropping it on the body', () => {
+			fixture.componentRef.setInput('maxItems', 4);
+			fixture.detectChanges();
+
+			indicator().nativeElement.focus();
+			indicator().nativeElement.click();
+			fixture.detectChanges();
+			TestBed.inject(ApplicationRef).tick();
+
+			const revealed: HTMLElement = fixture.debugElement.queryAll(By.css('.hub-breadcrumb__link'))[1].nativeElement;
+			expect((revealed.textContent ?? '').trim()).toBe('Two');
+			expect(document.activeElement).toBe(revealed);
+		});
+
+		it('focuses the crumb that itemsBeforeCollapse leaves first in the hidden range', () => {
+			fixture.componentRef.setInput('maxItems', 4);
+			fixture.componentRef.setInput('itemsBeforeCollapse', 3);
+			fixture.detectChanges();
+
+			indicator().nativeElement.click();
+			fixture.detectChanges();
+			TestBed.inject(ApplicationRef).tick();
+
+			expect((document.activeElement?.textContent ?? '').trim()).toBe('Four');
+		});
+
 		it('collapses again when a new trail arrives', () => {
 			fixture.componentRef.setInput('maxItems', 4);
 			fixture.detectChanges();
 			indicator().nativeElement.click();
 			fixture.detectChanges();
 
-			service.source.next(trail('A', 'B', 'C', 'D', 'E'));
+			service.source.set(trail('A', 'B', 'C', 'D', 'E'));
 			fixture.detectChanges();
 
 			expect(indicator()).not.toBeNull();
 			expect(labels()).toEqual(['A', 'E']);
+		});
+	});
+
+	describe('accent variants', () => {
+		/** The nine accents the SCSS `@each` loop already emits a rule for. */
+		const builtIn = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'neutral', 'light', 'dark'];
+
+		const inlineAccent = (): string => fixture.nativeElement.style.getPropertyValue('--hub-breadcrumb-accent');
+
+		it('leaves every built-in accent to the stylesheet', () => {
+			for (const variant of builtIn) {
+				fixture.componentRef.setInput('variant', variant);
+				fixture.detectChanges();
+
+				expect(fixture.nativeElement.getAttribute('data-variant')).toBe(variant);
+				expect(inlineAccent()).toBe('');
+			}
+		});
+
+		it('inlines the accent slot for a custom variant', () => {
+			fixture.componentRef.setInput('variant', 'brand');
+			fixture.detectChanges();
+
+			expect(inlineAccent()).toBe('var(--hub-sys-color-brand)');
 		});
 	});
 
@@ -204,7 +283,29 @@ describe('HubBreadcrumbComponent', () => {
 
 			const current = fixture.debugElement.query(By.css('.hub-breadcrumb__text'));
 			expect(current.nativeElement.tagName).toBe('SPAN');
-			expect(current.nativeElement.getAttribute('aria-current')).toBe('page');
+		});
+	});
+
+	describe('current page marker', () => {
+		/** `aria-current` per rendered crumb, in order. */
+		const currentFlags = (from: ComponentFixture<unknown>): (string | null)[] =>
+			from.debugElement
+				.queryAll(By.css('.hub-breadcrumb__item'))
+				.map((el) => el.nativeElement.getAttribute('aria-current'));
+
+		it('marks the last crumb of the default markup', () => {
+			fixture.componentRef.setInput('items', trail('Home', 'Products', 'Detail'));
+			fixture.detectChanges();
+
+			expect(currentFlags(fixture)).toEqual([null, null, 'page']);
+		});
+
+		it('marks the last crumb when a custom template renders it', () => {
+			const host = TestBed.createComponent(CustomTemplateHostComponent);
+			host.detectChanges();
+
+			expect(host.debugElement.queryAll(By.css('.custom-crumb')).length).toBe(3);
+			expect(currentFlags(host)).toEqual([null, null, 'page']);
 		});
 	});
 });

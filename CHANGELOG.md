@@ -2,6 +2,104 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.6.0] - 2026-09-06
+
+### Added
+
+- **`HubBreadcrumbsService.breadcrumbs`, the trail as a signal.** The service published one
+  member, an Observable, so every consumer that wanted the trail in a signal-based component
+  wrote the same `toSignal(svc.breadcrumbs$, { initialValue: [] })` — this library's own
+  component included. It is wrapped once now, inside the service, and subscribed once for the
+  whole application instead of once per breadcrumb on screen. `breadcrumbs$` stays exactly as
+  it was for code already composing with rxjs.
+
+### Changed
+
+- **`HubBreadcrumbComponent` no longer re-exports `breadcrumbs$`.** The component carried the
+  service's Observable as a public field *and* a signal derived from it, so one trail had two
+  public surfaces on the same class and neither was the one the template rendered. It now reads
+  `HubBreadcrumbsService.breadcrumbs` directly. Anyone who was reading the field can inject the
+  service — that is where the trail was coming from anyway — and anyone substituting the service
+  must publish `breadcrumbs`. See `BREAKING_CHANGES.md`.
+
+- **`HubBreadcrumbComponent` now declares `ChangeDetectionStrategy.OnPush`.** The trail, the collapse
+  state and the accent are all `computed`, so the component never needed a check it had not been
+  marked for, and Angular 22 reads a component that names no strategy as OnPush anyway — nothing
+  changes for an application on the current major. The declaration is what carries the strategy into
+  the published package: partial compilation only writes it when the source states it, and this
+  library's peer range still admits Angular 18, whose linker falls back to `Eager`.
+
+### Deprecated
+
+- **`HubBreadcrumbsModule`, marked for removal in 23.0.0.** The class carried no `@deprecated` tag,
+  so an editor gave no hint and neither did the build: a consumer had no way of learning the module
+  was on its way out before it stopped existing. It now says so. The module imports and exports
+  `HubBreadcrumbComponent` and `HubBreadcrumbItemDirective` — both standalone, both already exported
+  from the entry point — and provides nothing of its own, so importing them directly is the whole
+  migration. `HubBreadcrumbsService` is `providedIn: 'root'` and never travelled through the module.
+  See `BREAKING_CHANGES.md`.
+
+### Fixed
+
+- **Opening a collapsed trail from the keyboard no longer leaves focus on the page body.** The
+  `…` indicator is the element the reader activates, and expanding removes it from the DOM —
+  the browser answers that by focusing `<body>`, so someone who had just pressed Enter had to
+  tab from the top of the page to reach the crumbs they asked for. Focus is now handed to the
+  first crumb the gesture reveals (the one at `itemsBeforeCollapse`), which is where reading
+  continues; a crumb that renders as plain text takes it through a temporary `tabindex="-1"`,
+  so focus is never dropped. Consumers who moved focus by hand in `(collapsedClick)` can drop
+  that code.
+
+- **The current crumb is announced as the current page even when the consumer renders it.**
+  `aria-current="page"` sat on the default `<span>` — the one branch a `hubBreadcrumbItem`
+  template replaces — so a trail with a custom template reached assistive technology with
+  nothing marking the current page, while the docs kept promising the attribute unqualified.
+  It now sits on the `<li>`, which wraps every branch, custom templates included. Note that it
+  **moved**: a stylesheet or a test selecting `.hub-breadcrumb__text[aria-current]` should read
+  `.hub-breadcrumb__item[aria-current]` instead (the `hub-breadcrumb__item--active` modifier is
+  unchanged and is still the styling hook).
+
+- **`--hub-breadcrumb-accent` set from the application reaches the component again.** The slot
+  was declared on `:host`, which under emulated encapsulation is a `[_nghost]` rule (0,1,0) on
+  the crumb element itself: a consumer's `hub-breadcrumb { --hub-breadcrumb-accent: … }` (0,0,1)
+  lost, `.hub-breadcrumb { … }` tied and lost on source order, and a value inherited from an
+  ancestor — a wrapper div, a scope class, the `hub-breadcrumb-theme()` mixin included on one —
+  never reached the links at all, because a declaration on the element always beats inheritance.
+  22.5.0 measured this and documented the workaround; the cascade itself is now fixed. The slot
+  is no longer declared on the host: it is read where it is consumed as
+  `var(--hub-breadcrumb-accent, var(--hub-sys-color-primary, #0d6efd))`, so the default look is
+  byte-identical, `variant` still wins over a consumer rule (that is what a variant is for), and
+  a plain tag or class rule — or any ancestor — now recolours the links and everything derived
+  from them. Measured in a browser against the compiled and shimmed CSS. The remaining
+  `--hub-breadcrumb-*` defaults still live on `:host`, so overriding those still means the crumb
+  element itself or `.hub-breadcrumb__list`.
+
+- **The built-in variant list in the component now names the same nine accents its stylesheet
+  emits.** 22.2.0 grew the accent set from five to the nine canonical ones in the SCSS `@each`
+  loop, but `BUILT_IN_VARIANTS` was left at the original five, so `secondary`, `neutral`, `light`
+  and `dark` were treated as custom accents and got an inline `--hub-breadcrumb-accent` on the
+  host on top of the stylesheet rule that already set them. Nothing rendered differently — both
+  paths resolve to the same token — but an inline style outranks anything a consumer writes in a
+  sheet, so overriding the accent for one of those four took an `!important` it should never have
+  needed. The `variant` JSDoc listed the same stale five and now names all nine.
+
+- **The documentation described an API this library does not have, and taught a mixin selector
+  that does not win.** The README opened its reference with "exposes a single optional input"
+  above a table of seven inputs and one output, listed five built-in variants against the nine
+  the stylesheet emits, never named `HubBreadcrumbLabelDirective` or the tooltip adapter
+  contract although both are exported, promised truncation without saying that a
+  `hubBreadcrumbItem` template renders its own elements — which the component's scoped styles
+  cannot reach, so they get neither the ellipsis nor the tooltip — and still announced v21.1.0
+  as the latest release. The `hub-breadcrumb-theme()` snippet included the mixin on a bare
+  class, which ties with `:host` and loses on source order, or on a wrapper, from where every
+  token but the accent is shut out by the host's own declaration; it now lands on the crumb
+  element with a selector that outranks `:host`, measured in a browser against the shimmed CSS.
+  `BREAKING_CHANGES.md` was titled after v21.1.0 over a 22.4.0 section, `FUNCTIONALITIES.md`
+  marked `(collapsedClick)` and the tooltip adapter as uncovered while the examples exercise
+  both, and `docs/css-variables-reference.md` referenced the three derived `-accent-*` tokens
+  from other rows without documenting any of them. Documentation only — no code, no types and
+  no styles change.
+
 ## [22.5.2] - 2026-09-02
 
 ### Fixed

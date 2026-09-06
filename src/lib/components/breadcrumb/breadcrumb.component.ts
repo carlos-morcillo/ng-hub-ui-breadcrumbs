@@ -1,14 +1,41 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, contentChild, inject, input, linkedSignal, output, TemplateRef } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import {
+	afterNextRender,
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	contentChild,
+	ElementRef,
+	inject,
+	Injector,
+	input,
+	linkedSignal,
+	output,
+	TemplateRef
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HubBreadcrumbItemDirective } from '../../directives/breadcrumb-item.directive';
 import { HubBreadcrumbLabelDirective } from '../../directives/breadcrumb-label.directive';
 import { BreadcrumbItem } from '../../models/breadcrumb-item';
 import { HubBreadcrumbsService } from '../../services/breadcrumbs.service';
 
-/** Variants with exact design-system token coverage via the SCSS `@each` loop. */
-const BUILT_IN_VARIANTS = new Set<string>(['primary', 'success', 'danger', 'warning', 'info']);
+/**
+ * Variants with exact design-system token coverage via the SCSS `@each` loop.
+ * Kept in step with that loop by hand, because Sass cannot read this file: a name
+ * dropped from here is not broken, only paid for twice — once inline and once by
+ * the stylesheet.
+ */
+const BUILT_IN_VARIANTS = new Set<string>([
+	'primary',
+	'secondary',
+	'success',
+	'danger',
+	'warning',
+	'info',
+	'neutral',
+	'light',
+	'dark'
+]);
 
 /**
  * One rendered position of the trail. A `null` item is the collapsed indicator,
@@ -27,6 +54,7 @@ interface BreadcrumbRow {
 	imports: [RouterLink, NgTemplateOutlet, HubBreadcrumbLabelDirective],
 	templateUrl: './breadcrumb.component.html',
 	styleUrl: './breadcrumb.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
 		class: 'hub-breadcrumb',
 		'[class.hub-breadcrumb--truncate]': 'truncateItems()',
@@ -36,16 +64,17 @@ interface BreadcrumbRow {
 })
 export class HubBreadcrumbComponent {
 	#breadcrumbsSvc = inject(HubBreadcrumbsService);
+	#host = inject<ElementRef<HTMLElement>>(ElementRef);
+	#injector = inject(Injector);
 
 	readonly itemTemplate = contentChild(HubBreadcrumbItemDirective, { read: TemplateRef });
 
-	breadcrumbs$ = this.#breadcrumbsSvc.breadcrumbs$;
-
 	/**
-	 * Semantic accent for the breadcrumb links: `'primary'` · `'success'` ·
-	 * `'danger'` · `'warning'` · `'info'`, or any custom string (read as
-	 * `--hub-sys-color-<variant>`). Re-bases `--hub-breadcrumb-accent`; the
-	 * current (last) item stays muted. Defaults to the standard link colour.
+	 * Semantic accent for the breadcrumb links: `'primary'` · `'secondary'` ·
+	 * `'success'` · `'danger'` · `'warning'` · `'info'` · `'neutral'` · `'light'` ·
+	 * `'dark'`, or any custom string (read as `--hub-sys-color-<variant>`).
+	 * Re-bases `--hub-breadcrumb-accent`; the current (last) item stays muted.
+	 * Defaults to the standard link colour.
 	 */
 	readonly variant = input<string>();
 
@@ -92,11 +121,8 @@ export class HubBreadcrumbComponent {
 	 */
 	readonly collapsedClick = output<void>();
 
-	/** Trail as published by the service, tracked as a signal. */
-	readonly #routerTrail = toSignal(this.breadcrumbs$, { initialValue: [] as BreadcrumbItem[] });
-
 	/** Effective trail: the manual one when supplied, the router's otherwise. */
-	protected readonly trail = computed(() => this.items() ?? this.#routerTrail());
+	protected readonly trail = computed(() => this.items() ?? this.#breadcrumbsSvc.breadcrumbs());
 
 	/**
 	 * Whether the reader has opened a collapsed trail. Derived from the trail so a
@@ -137,8 +163,8 @@ export class HubBreadcrumbComponent {
 	});
 
 	/**
-	 * Inline accent for custom (non-built-in) variants — the built-in five are
-	 * resolved by the SCSS `@each` loop, so this returns `null` for them.
+	 * Inline accent for custom (non-built-in) variants — the nine built-in accents
+	 * are resolved by the SCSS `@each` loop, so this returns `null` for them.
 	 */
 	protected readonly customAccent = computed(() => {
 		const v = this.variant();
@@ -149,6 +175,33 @@ export class HubBreadcrumbComponent {
 	protected expand(): void {
 		this.expanded.set(true);
 		this.collapsedClick.emit();
+		afterNextRender(() => this.#focusFirstRevealedCrumb(), { injector: this.#injector });
+	}
+
+	/**
+	 * Expanding removes the indicator — the element that was holding focus — from the
+	 * DOM, and a browser answers that by focusing `<body>`: whoever opened the trail
+	 * from the keyboard would have to tab from the top of the page to reach the crumbs
+	 * they just asked for. Focus lands on the first revealed crumb instead, which is
+	 * where reading continues.
+	 */
+	#focusFirstRevealedCrumb(): void {
+		const crumbs = this.#host.nativeElement.querySelectorAll<HTMLElement>('.hub-breadcrumb__item');
+		const revealed = crumbs[Math.max(0, this.itemsBeforeCollapse())];
+
+		if (!revealed) {
+			return;
+		}
+
+		// A crumb may render as plain text — the current page, or a custom template with
+		// no control of its own — and text takes no focus. Make that one crumb
+		// programmatically focusable rather than let focus fall back to the body.
+		const target = revealed.querySelector<HTMLElement>('a, button, [tabindex]') ?? revealed;
+		if (target === revealed) {
+			revealed.tabIndex = -1;
+		}
+
+		target.focus();
 	}
 
 	/**

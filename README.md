@@ -122,7 +122,7 @@ const routes: Routes = [
 
 ### 1. Import the Component
 
-You can import the `HubBreadcrumbComponent` directly in your standalone component, or use `HubBreadcrumbsModule` in a module-based setup.
+Import `HubBreadcrumbComponent` directly in your component. (`HubBreadcrumbsModule` still works in a module-based setup, but it is deprecated — see [HubBreadcrumbsModule](#hubbreadcrumbsmodule).)
 
 ```typescript
 import { HubBreadcrumbComponent } from 'ng-hub-ui-breadcrumbs';
@@ -271,7 +271,7 @@ Fully customize the structure, including separators/dividers.
 
 ### HubBreadcrumbComponent
 
-The main container component. It reads the breadcrumb trail directly from the Angular `Router` and exposes a single optional input for theming the links.
+The main container component. It reads the breadcrumb trail directly from the Angular `Router` — or takes it from `items` when you hand it one — and exposes seven inputs, one output and an optional item template.
 
 | Selector         | Host class        |
 | ---------------- | ----------------- |
@@ -281,8 +281,8 @@ The main container component. It reads the breadcrumb trail directly from the An
 
 | Input     | Type     | Default     | Description                                                                                                                                                                                                                                                                                                                  |
 | --------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variant` | `string` | `undefined` | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `success`, `danger`, `warning`, `info`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change). |
-| `truncateItems` | `boolean` | `false` | When `true`, clips each label to `--hub-breadcrumb-max-item-width` (default `12rem`) with an ellipsis and shows the full text as a tooltip when a label overflows. Off by default, so the standard layout and wrapping are unchanged. |
+| `variant` | `string` | `undefined` | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change). |
+| `truncateItems` | `boolean` | `false` | When `true`, clips each label to `--hub-breadcrumb-max-item-width` (default `12rem`) with an ellipsis and shows the full text as a tooltip when a label overflows. Off by default, so the standard layout and wrapping are unchanged. It dresses the markup the component renders itself: a `hubBreadcrumbItem` template supplies its own elements, which the component's scoped styles cannot reach — see [`HubBreadcrumbLabelDirective`](#hubbreadcrumblabeldirective) for how a custom template opts back in. |
 | `items` | `BreadcrumbItem[] \| null` | `null` | Trail supplied by you, replacing the one derived from the router. The way in for crumbs the route tree cannot express — an ancestor served by another application, or a trail assembled by hand. Left `null`, the component keeps reading `HubBreadcrumbsService`. |
 | `maxItems` | `number \| undefined` | `undefined` | Length above which the trail collapses behind an indicator. Undefined never collapses, however long the trail grows. |
 | `itemsBeforeCollapse` | `number` | `1` | Crumbs kept at the head of a collapsed trail. |
@@ -316,8 +316,9 @@ The main container component. It reads the breadcrumb trail directly from the An
 
 Above `maxItems` crumbs the middle folds behind a `…` button. The button takes
 keyboard focus, announces itself with `collapsedAriaLabel`, opens the trail in
-place and emits `collapsedClick`. An expansion answers one trail: the next
-navigation collapses it again.
+place and emits `collapsedClick`. Expanding removes the button, so focus moves on
+to the first crumb it revealed instead of falling back to the page body. An
+expansion answers one trail: the next navigation collapses it again.
 
 #### Crumbs that leave the application
 
@@ -383,17 +384,56 @@ A structural directive used to define a custom template for breadcrumb items.
 | --------------------- | --------------------------- |
 | `[hubBreadcrumbItem]` | `BreadcrumbTemplateContext` |
 
+### HubBreadcrumbLabelDirective
+
+Adds the overflow tooltip to a breadcrumb label. The component applies it to the labels it
+renders itself; it is exported so a custom `hubBreadcrumbItem` template can opt back in.
+
+| Selector               | Input                                     | Default |
+| ---------------------- | ----------------------------------------- | ------- |
+| `[hubBreadcrumbLabel]` | `hubBreadcrumbLabel: string` (alias) — explicit tooltip text | `''` |
+
+Left empty, the tooltip text is the host element's own text content, and it is shown only
+while that text is actually clipped. The directive never clips anything itself: the ellipsis
+comes from the `truncateItems` styles, which reach only the component's own markup, so a
+custom template has to clip its label in its own stylesheet. Import
+`HubBreadcrumbLabelDirective` into the component that declares the template.
+
+```html
+<hub-breadcrumb [truncateItems]="true">
+	<ng-template hubBreadcrumbItem let-item>
+		<a class="my-crumb" hubBreadcrumbLabel [routerLink]="item.url">{{ item.label }}</a>
+	</ng-template>
+</hub-breadcrumb>
+```
+
+### Tooltip adapter
+
+The contract truncated labels use to reach a richer tooltip. It is structurally typed and
+declared here rather than imported, so the package keeps zero hard dependencies.
+
+| Export                           | Kind                   | Description                                                              |
+| -------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| `provideHubBreadcrumbTooltip()`  | `EnvironmentProviders` | Registers an adapter once for the whole application.                     |
+| `HUB_BREADCRUMB_TOOLTIP_ADAPTER` | `InjectionToken`       | The token the provider fills. Inject it with `{ optional: true }`.       |
+| `HubBreadcrumbTooltipAdapter`    | interface              | `attach(host: HTMLElement, text: string): HubBreadcrumbTooltipHandle`.   |
+| `HubBreadcrumbTooltipHandle`     | interface              | `update(text: string): void` and `destroy(): void`.                      |
+
 ### HubBreadcrumbsService
 
-An injectable (`providedIn: 'root'`) service that exposes the reactive breadcrumb stream. The component uses it internally; you can also inject it directly when you need the breadcrumb data elsewhere.
+An injectable (`providedIn: 'root'`) service that publishes the breadcrumb trail. The component reads the signal; you can also inject it directly when you need the breadcrumb data elsewhere.
 
-| Member          | Type                          | Description                                                                   |
-| --------------- | ----------------------------- | ----------------------------------------------------------------------------- |
-| `breadcrumbs$`  | `Observable<BreadcrumbItem[]>` | Emits the current breadcrumb trail on every `NavigationEnd` (and on startup). |
+| Member         | Type                           | Description                                                                        |
+| -------------- | ------------------------------ | ---------------------------------------------------------------------------------- |
+| `breadcrumbs`  | `Signal<BreadcrumbItem[]>`     | The current trail. Read it in a template or a `computed`, with nothing to wrap.    |
+| `breadcrumbs$` | `Observable<BreadcrumbItem[]>` | The same trail as a stream, for code already composing with rxjs.                  |
+
+Replacing the service (a test double, a facade over another source) means publishing
+`breadcrumbs`: that is the member the component reads.
 
 ### HubBreadcrumbsModule
 
-An optional `NgModule` that imports and exports `HubBreadcrumbComponent` and `HubBreadcrumbItemDirective` for module-based applications.
+**Deprecated — removed in 23.0.0.** An `NgModule` that imports and exports `HubBreadcrumbComponent` and `HubBreadcrumbItemDirective` for module-based applications, and provides nothing of its own. Import the two declarables directly instead; `HubBreadcrumbsService` is `providedIn: 'root'` and never travelled through the module. See `BREAKING_CHANGES.md`.
 
 ### Interfaces
 
@@ -450,11 +490,12 @@ For a complete and up-to-date token catalog, see [CSS Variables Reference](./doc
 The link colour follows the `--hub-breadcrumb-accent` token (which itself defaults to the standard link colour). Setting a `variant` re-bases this token; you can also override it directly:
 
 ```scss
-/* The accent is read on the crumb element itself (the link colour and its hover are
-   derived there), so the override must land on that element and must outrank the
-   component's own `:host` defaults — a bare `.hub-breadcrumb` rule ties on specificity
-   and loses on source order. Scope it, or set it inline. */
-.my-page .hub-breadcrumb {
+/* The accent slot is deliberately not declared on the component's host, so any rule of
+   yours wins with no scoping trick: the crumb element by tag or by class, or an ancestor
+   it inherits from. A `variant` still wins over both — that is what a variant is for.
+   The remaining tokens keep their defaults on `:host`, so those go on the crumb element
+   itself or on `.hub-breadcrumb__list`. */
+hub-breadcrumb {
 	--hub-breadcrumb-accent: var(--hub-sys-color-info);
 }
 ```
@@ -464,8 +505,9 @@ The link colour follows the `--hub-breadcrumb-accent` token (which itself defaul
 Keyboard focus is drawn with the design-system ring, so a breadcrumb focus looks like focus everywhere else in the application. Re-tint it without touching the outline:
 
 ```scss
-/* The component declares its defaults on :host, so an override has to land on the
-   crumb element itself or inside it — a token set on an ancestor never reaches it. */
+/* These defaults are declared on :host, so an override has to land on the crumb element
+   itself or inside it — a value set on an ancestor never reaches them. (The accent is the
+   exception: it is deliberately left undeclared, so it does inherit.) */
 .hub-breadcrumb__list {
 	--hub-breadcrumb-focus-ring-color: rgba(25, 135, 84, 0.35);
 	--hub-breadcrumb-focus-ring-width: 0.25rem;
@@ -496,10 +538,19 @@ Keyboard focus is drawn with the design-system ring, so a breadcrumb focus looks
 
 For a one-call theme that sets surface, spacing, divider, current-item colour, links and accent, use the `hub-breadcrumb-theme()` mixin. Every parameter is optional and defaults to `null`, so only the ones you pass are emitted as `--hub-breadcrumb-*` overrides. It is token-based with no Bootstrap dependency.
 
+Include it on the `<hub-breadcrumb>` element with a selector that outranks the component's
+own `:host` defaults — tag plus class does it. A bare `.docs-breadcrumb` ties on specificity
+and loses on source order, and the same class on a wrapper never reaches the component at
+all, because a declaration on the element always beats an inherited value.
+
+```html
+<hub-breadcrumb class="docs-breadcrumb"></hub-breadcrumb>
+```
+
 ```scss
 @use 'ng-hub-ui-breadcrumbs/styles/mixins/breadcrumb-theme' as *;
 
-.docs-breadcrumb {
+hub-breadcrumb.docs-breadcrumb {
 	@include hub-breadcrumb-theme(
 		$bg: #f8fafc,
 		$padding-x: 0.75rem,
@@ -509,11 +560,14 @@ For a one-call theme that sets surface, spacing, divider, current-item colour, l
 }
 ```
 
+An include that passes `$accent` and nothing else is the one exception: the accent slot is
+not declared on the host, so it may sit on an ancestor and still recolour the links.
+
 ## Changelog
 
 All notable changes are documented in the [CHANGELOG.md](./CHANGELOG.md). For breaking changes, see [BREAKING_CHANGES.md](./BREAKING_CHANGES.md).
 
-The latest release is **v21.1.0**, which renamed the selector from `hub-breadcrumbs` to `hub-breadcrumb` and bundled the component styles (manual style imports are no longer required).
+The latest release is **v22.5.2**, a fix for a breadcrumb drawn before the first navigation completes. The collapsing inputs, crumbs pointing outside the router and the keyboard focus ring arrived in **v22.5.0**; the packaging path `ng-hub-ui-breadcrumbs/styles` in **v22.4.0**.
 
 ## Contributing
 

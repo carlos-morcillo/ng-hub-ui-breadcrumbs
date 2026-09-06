@@ -11,11 +11,18 @@
 // automatically; use this mixin to restyle the shell — surface, spacing,
 // divider, link colours — or to set a brand accent on a custom selector.
 //
+// Include it ON the `<hub-breadcrumb>` element, with a selector that outranks the
+// component's own `:host` defaults — tag plus class does it. A bare class ties on
+// specificity and loses on source order, and the same class on a wrapper never
+// reaches the component, because a declaration on the element beats inheritance.
+// The single exception is an include that passes only `$accent`: that slot is left
+// undeclared on the host on purpose, so it inherits from wherever you set it.
+//
 // @example
 //
 //   @use 'ng-hub-ui-breadcrumbs/styles' as *;
 //
-//   .docs-breadcrumb {
+//   hub-breadcrumb.docs-breadcrumb {
 //     @include hub-breadcrumb-theme(
 //       $bg: #f8fafc,
 //       $padding-x: 0.75rem,

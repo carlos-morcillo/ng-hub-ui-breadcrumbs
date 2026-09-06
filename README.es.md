@@ -122,7 +122,7 @@ const routes: Routes = [
 
 ### 1. Importa el componente
 
-Puedes importar `HubBreadcrumbComponent` directamente en tu componente standalone, o usar `HubBreadcrumbsModule` en una configuración basada en módulos.
+Importa `HubBreadcrumbComponent` directamente en tu componente. (`HubBreadcrumbsModule` sigue funcionando en una configuración basada en módulos, pero está obsoleto: consulta [HubBreadcrumbsModule](#hubbreadcrumbsmodule).)
 
 ```typescript
 import { HubBreadcrumbComponent } from 'ng-hub-ui-breadcrumbs';
@@ -271,7 +271,7 @@ Personaliza completamente la estructura, incluidos los separadores/divisores.
 
 ### HubBreadcrumbComponent
 
-El componente contenedor principal. Lee la ruta de breadcrumbs directamente del `Router` de Angular y expone un único input opcional para tematizar los enlaces.
+El componente contenedor principal. Lee la ruta de breadcrumbs directamente del `Router` de Angular —o la toma de `items` cuando le pasas una— y expone siete inputs, un output y una plantilla de elemento opcional.
 
 | Selector         | Clase del host    |
 | ---------------- | ----------------- |
@@ -281,8 +281,8 @@ El componente contenedor principal. Lee la ruta de breadcrumbs directamente del 
 
 | Input     | Tipo     | Por defecto | Descripción                                                                                                                                                                                                                                                                                                                                       |
 | --------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variant` | `string` | `undefined` | Selecciona un **acento semántico** para los enlaces del breadcrumb y su hover. Los valores integrados (`primary`, `success`, `danger`, `warning`, `info`) mapean a los tintes exactos del sistema de diseño; **también se acepta cualquier otra cadena**, que se resuelve a través de `--hub-sys-color-<variant>`. El elemento actual (el último) permanece siempre atenuado. Si se omite, los enlaces usan el color de enlace estándar (sin cambio visual). |
-| `truncateItems` | `boolean` | `false` | Si es `true`, recorta cada etiqueta a `--hub-breadcrumb-max-item-width` (por defecto `12rem`) con puntos suspensivos y muestra el texto completo como tooltip cuando una etiqueta desborda. Desactivado por defecto, así el layout estándar no cambia. |
+| `variant` | `string` | `undefined` | Selecciona un **acento semántico** para los enlaces del breadcrumb y su hover. Los valores integrados (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark`) mapean a los tintes exactos del sistema de diseño; **también se acepta cualquier otra cadena**, que se resuelve a través de `--hub-sys-color-<variant>`. El elemento actual (el último) permanece siempre atenuado. Si se omite, los enlaces usan el color de enlace estándar (sin cambio visual). |
+| `truncateItems` | `boolean` | `false` | Si es `true`, recorta cada etiqueta a `--hub-breadcrumb-max-item-width` (por defecto `12rem`) con puntos suspensivos y muestra el texto completo como tooltip cuando una etiqueta desborda. Desactivado por defecto, así el layout estándar no cambia. Viste el marcado que renderiza el propio componente: una plantilla `hubBreadcrumbItem` aporta sus propios elementos, a los que los estilos encapsulados del componente no llegan — mira [`HubBreadcrumbLabelDirective`](#hubbreadcrumblabeldirective) para saber cómo se reengancha una plantilla personalizada. |
 | `items` | `BreadcrumbItem[] \| null` | `null` | Ruta proporcionada por ti, que sustituye a la derivada del router. Es la vía para las migas que el árbol de rutas no puede expresar: un ancestro servido por otra aplicación, o una ruta compuesta a mano. Si se deja en `null`, el componente sigue leyendo `HubBreadcrumbsService`. |
 | `maxItems` | `number \| undefined` | `undefined` | Longitud a partir de la cual la ruta se colapsa tras un indicador. `undefined` no colapsa nunca, por larga que sea la ruta. |
 | `itemsBeforeCollapse` | `number` | `1` | Migas que se conservan al principio de una ruta colapsada. |
@@ -316,8 +316,9 @@ El componente contenedor principal. Lee la ruta de breadcrumbs directamente del 
 
 Por encima de `maxItems` migas, el centro se pliega tras un botón `…`. El botón
 recibe el foco de teclado, se anuncia con `collapsedAriaLabel`, abre la ruta en el
-sitio y emite `collapsedClick`. Una expansión responde a una ruta concreta: la
-siguiente navegación vuelve a colapsarla.
+sitio y emite `collapsedClick`. Al expandirse el botón desaparece, así que el foco
+pasa a la primera miga revelada en vez de caer en el cuerpo de la página. Una
+expansión responde a una ruta concreta: la siguiente navegación vuelve a colapsarla.
 
 #### Migas que salen de la aplicación
 
@@ -383,17 +384,58 @@ Una directiva estructural que se usa para definir una plantilla personalizada pa
 | --------------------- | --------------------------- |
 | `[hubBreadcrumbItem]` | `BreadcrumbTemplateContext` |
 
+### HubBreadcrumbLabelDirective
+
+Añade el tooltip de desbordamiento a la etiqueta de una miga. El componente la aplica a las
+etiquetas que renderiza él mismo; se exporta para que una plantilla `hubBreadcrumbItem`
+personalizada pueda reengancharse.
+
+| Selector               | Input                                                          | Por defecto |
+| ---------------------- | -------------------------------------------------------------- | ----------- |
+| `[hubBreadcrumbLabel]` | `hubBreadcrumbLabel: string` (alias) — texto explícito del tooltip | `''`     |
+
+Si se deja vacío, el texto del tooltip es el propio contenido de texto del elemento, y solo
+se muestra mientras ese texto esté recortado. La directiva no recorta nada: los puntos
+suspensivos vienen de los estilos de `truncateItems`, que solo alcanzan el marcado del
+componente, así que una plantilla personalizada debe recortar su etiqueta en su propia hoja
+de estilos. Importa `HubBreadcrumbLabelDirective` en el componente que declara la plantilla.
+
+```html
+<hub-breadcrumb [truncateItems]="true">
+	<ng-template hubBreadcrumbItem let-item>
+		<a class="my-crumb" hubBreadcrumbLabel [routerLink]="item.url">{{ item.label }}</a>
+	</ng-template>
+</hub-breadcrumb>
+```
+
+### Adaptador de tooltip
+
+El contrato por el que las etiquetas recortadas alcanzan un tooltip más rico. Está tipado
+estructuralmente y declarado aquí en vez de importado, así el paquete mantiene cero
+dependencias duras.
+
+| Export                           | Tipo                   | Descripción                                                              |
+| -------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
+| `provideHubBreadcrumbTooltip()`  | `EnvironmentProviders` | Registra un adaptador una sola vez para toda la aplicación.              |
+| `HUB_BREADCRUMB_TOOLTIP_ADAPTER` | `InjectionToken`       | El token que rellena el provider. Inyéctalo con `{ optional: true }`.    |
+| `HubBreadcrumbTooltipAdapter`    | interfaz               | `attach(host: HTMLElement, text: string): HubBreadcrumbTooltipHandle`.   |
+| `HubBreadcrumbTooltipHandle`     | interfaz               | `update(text: string): void` y `destroy(): void`.                        |
+
 ### HubBreadcrumbsService
 
-Un servicio inyectable (`providedIn: 'root'`) que expone el flujo reactivo de breadcrumbs. El componente lo usa internamente; también puedes inyectarlo directamente cuando necesites los datos de breadcrumb en otro lugar.
+Un servicio inyectable (`providedIn: 'root'`) que publica la ruta de breadcrumbs. El componente lee la señal; también puedes inyectarlo directamente cuando necesites los datos de breadcrumb en otro lugar.
 
-| Miembro         | Tipo                           | Descripción                                                                       |
-| --------------- | ------------------------------ | --------------------------------------------------------------------------------- |
-| `breadcrumbs$`  | `Observable<BreadcrumbItem[]>` | Emite la ruta de breadcrumbs actual en cada `NavigationEnd` (y al iniciarse).     |
+| Miembro        | Tipo                           | Descripción                                                                       |
+| -------------- | ------------------------------ | --------------------------------------------------------------------------------- |
+| `breadcrumbs`  | `Signal<BreadcrumbItem[]>`     | La ruta actual. Se lee en una plantilla o en un `computed`, sin nada que envolver. |
+| `breadcrumbs$` | `Observable<BreadcrumbItem[]>` | La misma ruta como flujo, para código que ya compone con rxjs.                    |
+
+Sustituir el servicio (un doble de test, una fachada sobre otra fuente) implica publicar
+`breadcrumbs`: es el miembro que lee el componente.
 
 ### HubBreadcrumbsModule
 
-Un `NgModule` opcional que importa y exporta `HubBreadcrumbComponent` y `HubBreadcrumbItemDirective` para aplicaciones basadas en módulos.
+**Obsoleto: se retira en la 23.0.0.** Un `NgModule` que importa y exporta `HubBreadcrumbComponent` y `HubBreadcrumbItemDirective` para aplicaciones basadas en módulos, y que no aporta nada más. Importa los dos declarables directamente; `HubBreadcrumbsService` es `providedIn: 'root'` y nunca pasó por el módulo. Consulta `BREAKING_CHANGES.md`.
 
 ### Interfaces
 
@@ -450,11 +492,12 @@ Para un catálogo completo y actualizado de tokens, consulta la [Referencia de v
 El color del enlace sigue al token `--hub-breadcrumb-accent` (que a su vez toma por defecto el color de enlace estándar). Al definir un `variant` se re-basa este token; también puedes sobrescribirlo directamente:
 
 ```scss
-/* El acento se lee en el propio elemento del breadcrumb (allí se derivan el color del
-   enlace y su hover), así que la sobrescritura debe caer en ese elemento y ganar a los
-   valores por defecto del componente en `:host`: una regla `.hub-breadcrumb` a secas
-   empata en especificidad y pierde por orden de carga. Acótala, o ponla inline. */
-.mi-pagina .hub-breadcrumb {
+/* El acento no se declara a propósito en el host del componente, así que cualquier regla
+   tuya gana sin trucos de especificidad: el elemento del breadcrumb por etiqueta o por
+   clase, o un ancestro del que lo herede. Un `variant` sigue ganando a ambos, que para eso
+   está. Los demás tokens conservan sus valores por defecto en `:host`, así que esos van en
+   el propio elemento del breadcrumb o en `.hub-breadcrumb__list`. */
+hub-breadcrumb {
 	--hub-breadcrumb-accent: var(--hub-sys-color-info);
 }
 ```
@@ -464,9 +507,10 @@ El color del enlace sigue al token `--hub-breadcrumb-accent` (que a su vez toma 
 El foco de teclado se dibuja con el anillo del sistema de diseño, de modo que el foco de un breadcrumb se ve como el foco de cualquier otro elemento de la aplicación. Se retinta sin tocar el `outline`:
 
 ```scss
-/* El componente declara sus valores por defecto en :host, así que la sobrescritura
-   debe caer en el propio elemento del breadcrumb o dentro de él: un token definido
-   en un ancestro nunca le llega. */
+/* Estos valores por defecto se declaran en :host, así que la sobrescritura debe caer en
+   el propio elemento del breadcrumb o dentro de él: un valor definido en un ancestro nunca
+   les llega. (El acento es la excepción: se deja sin declarar a propósito, así que sí se
+   hereda.) */
 .hub-breadcrumb__list {
 	--hub-breadcrumb-focus-ring-color: rgba(25, 135, 84, 0.35);
 	--hub-breadcrumb-focus-ring-width: 0.25rem;
@@ -497,10 +541,20 @@ El foco de teclado se dibuja con el anillo del sistema de diseño, de modo que e
 
 Para un tema en una sola llamada que ajuste la superficie, el espaciado, el separador, el color del elemento actual, los enlaces y el acento, usa el mixin `hub-breadcrumb-theme()`. Cada parámetro es opcional y vale `null` por defecto, de modo que solo se emiten como sobrescrituras `--hub-breadcrumb-*` los que pases. Está basado en tokens y no depende de Bootstrap.
 
+Inclúyelo sobre el elemento `<hub-breadcrumb>` con un selector que gane a los valores por
+defecto que el componente declara en `:host`: etiqueta más clase basta. Un `.docs-breadcrumb`
+a secas empata en especificidad y pierde por orden de carga, y esa misma clase en un envoltorio
+no llega nunca al componente, porque una declaración en el elemento siempre gana a un valor
+heredado.
+
+```html
+<hub-breadcrumb class="docs-breadcrumb"></hub-breadcrumb>
+```
+
 ```scss
 @use 'ng-hub-ui-breadcrumbs/styles/mixins/breadcrumb-theme' as *;
 
-.docs-breadcrumb {
+hub-breadcrumb.docs-breadcrumb {
 	@include hub-breadcrumb-theme(
 		$bg: #f8fafc,
 		$padding-x: 0.75rem,
@@ -510,11 +564,14 @@ Para un tema en una sola llamada que ajuste la superficie, el espaciado, el sepa
 }
 ```
 
+Una llamada que solo pase `$accent` es la excepción: el acento no se declara en el host, así
+que puede vivir en un ancestro y aun así recolorear los enlaces.
+
 ## Changelog
 
 Todos los cambios relevantes están documentados en el [CHANGELOG.md](./CHANGELOG.md). Para los cambios incompatibles, consulta [BREAKING_CHANGES.md](./BREAKING_CHANGES.md).
 
-La última versión es la **v21.1.0**, que renombró el selector de `hub-breadcrumbs` a `hub-breadcrumb` e incluyó los estilos dentro del componente (ya no se requieren importaciones manuales de estilos).
+La última versión es la **v22.5.2**, una corrección para el breadcrumb dibujado antes de que termine la primera navegación. Los inputs de colapso, las migas que apuntan fuera del router y el anillo de foco de teclado llegaron en la **v22.5.0**; la ruta de empaquetado `ng-hub-ui-breadcrumbs/styles`, en la **v22.4.0**.
 
 ## Contribución
 

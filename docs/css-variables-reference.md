@@ -88,6 +88,9 @@ Defined and consumed by `projects/breadcrumbs/src/lib/components/breadcrumb/brea
 |---|---|
 | `--hub-breadcrumb-item-active-color` | `var(--hub-sys-text-muted, #6c757d)` |
 | `--hub-breadcrumb-accent` | `var(--hub-sys-color-primary, #0d6efd)` |
+| `--hub-breadcrumb-accent-emphasis` | `color-mix(in oklch, var(--hub-breadcrumb-accent) 80%, var(--hub-sys-color-ink, #212529))` |
+| `--hub-breadcrumb-accent-subtle` | `color-mix(in oklch, var(--hub-breadcrumb-accent) 12%, var(--hub-sys-surface-page, #fff))` |
+| `--hub-breadcrumb-accent-on` | `oklch(from var(--hub-breadcrumb-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h)` |
 | `--hub-breadcrumb-link-color` | `var(--hub-breadcrumb-accent)` |
 | `--hub-breadcrumb-link-hover-color` | `var(--hub-breadcrumb-accent-emphasis, var(--hub-sys-link-hover-color, #0a58ca))` |
 | `--hub-breadcrumb-link-decoration` | `none` |
@@ -112,6 +115,10 @@ Shown only when `maxItems` folds the trail.
 | `--hub-breadcrumb-collapsed-hover-bg` | `var(--hub-breadcrumb-accent-subtle)` |
 
 > `--hub-breadcrumb-accent` is the semantic accent that drives the link colour. Setting a `variant` on `<hub-breadcrumb>` (e.g. `variant="success"`) re-bases it to the matching design-system family; you can also override it directly.
+>
+> The three `-accent-*` tokens are **derived** from that slot the way the `ng-hub-ui-ds` engine derives a role family, so re-basing the accent re-tones the link hover (`-emphasis`) and the collapsed indicator's hover surface (`-subtle`) with it. Override one only to break that relationship on purpose; `-on` is the contrast colour, kept for completeness.
+>
+> The accent is the one token this library deliberately does **not** declare on the component's host, so it is also the only one that can be set on an ancestor and still arrive. Every other token here has a default on `:host`, which a value on an ancestor can never beat: put those on the crumb element itself (with a selector that outranks `:host`, e.g. `hub-breadcrumb.my-class`) or on `.hub-breadcrumb__list`.
 
 ---
 

@@ -1,4 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
 import { BreadcrumbItem, BreadcrumbRouteConfig, BreadcrumbRouteData } from '../models/breadcrumb-item';
@@ -10,11 +11,20 @@ export class HubBreadcrumbsService {
 	#router = inject(Router);
 	#activatedRoute = inject(ActivatedRoute);
 
+	/** The trail as a stream, for consumers already composing with rxjs. */
 	breadcrumbs$ = this.#router.events.pipe(
 		filter((event) => event instanceof NavigationEnd),
 		startWith(undefined),
 		map(() => this.createBreadcrumbs(this.#activatedRoute.root))
 	);
+
+	/**
+	 * The trail as a signal, and the surface the component reads. Published here
+	 * rather than left to each consumer, because a stream that only ever carries
+	 * the current trail is one every caller was wrapping in the same `toSignal`
+	 * — the component included. Wrapped once, subscribed once.
+	 */
+	readonly breadcrumbs: Signal<BreadcrumbItem[]> = toSignal(this.breadcrumbs$, { initialValue: [] as BreadcrumbItem[] });
 
 	private createBreadcrumbs(route: ActivatedRoute, url: string = '', breadcrumbs: BreadcrumbItem[] = []): BreadcrumbItem[] {
 		const children: ActivatedRoute[] = route.children;

@@ -2,7 +2,11 @@
 	<ol class="hub-breadcrumb__list">
 		@for (row of rows(); track $index) {
 			@if (row.item; as item) {
-				<li class="hub-breadcrumb__item" [class.hub-breadcrumb__item--active]="row.isLast">
+				<li
+					class="hub-breadcrumb__item"
+					[class.hub-breadcrumb__item--active]="row.isLast"
+					[attr.aria-current]="row.isLast ? 'page' : null"
+				>
 					@if (itemTemplate(); as template) {
 						<ng-container
 							[ngTemplateOutlet]="template"
@@ -12,7 +16,7 @@
 							}"
 						/>
 					} @else if (row.isLast) {
-						<span class="hub-breadcrumb__text" hubBreadcrumbLabel aria-current="page">{{ item.label }}</span>
+						<span class="hub-breadcrumb__text" hubBreadcrumbLabel>{{ item.label }}</span>
 					} @else if (item.href) {
 						<a
 							class="hub-breadcrumb__link"

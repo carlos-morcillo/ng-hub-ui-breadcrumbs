@@ -9,18 +9,18 @@
 	--hub-breadcrumb-divider-color: var(--hub-sys-text-muted, #6c757d);
 	--hub-breadcrumb-item-padding-x: var(--hub-ref-space-1, 0.25rem);
 	--hub-breadcrumb-item-active-color: var(--hub-sys-text-muted, #6c757d);
-	// Semantic accent for the links — a single slot defaulting to primary (the
-	// standard link colour), so a neutral breadcrumb is unchanged. A `variant`
-	// re-bases this slot (see @each below) and the roles below recompute from it.
-	// The role family is derived LOCALLY from the slot, mirroring the ds engine,
-	// so any accent — a known variant or a custom `brand` — gives a coherent link
-	// colour + hover with no recompilation. `-on` is provided for completeness
-	// (accent-filled surfaces); the link hover uses `-emphasis`.
-	--hub-breadcrumb-accent: var(--hub-sys-color-primary, #0d6efd);
-	--hub-breadcrumb-accent-emphasis: color-mix(in oklch, var(--hub-breadcrumb-accent) 80%, var(--hub-sys-color-ink, #212529));
-	--hub-breadcrumb-accent-subtle: color-mix(in oklch, var(--hub-breadcrumb-accent) 12%, var(--hub-sys-surface-page, #fff));
-	--hub-breadcrumb-accent-on: oklch(from var(--hub-breadcrumb-accent) clamp(0, (0.62 - l) * 1000, 1) 0 h);
-	--hub-breadcrumb-link-color: var(--hub-breadcrumb-accent);
+	// Semantic accent for the links — one slot defaulting to primary (the standard
+	// link colour), so a neutral breadcrumb is unchanged. A `variant` re-bases it
+	// (see @each below) and the role family recomputes from it, derived LOCALLY the
+	// way the ds engine does. (`-on` is there for completeness; the hover uses
+	// `-emphasis`.) The slot itself is NOT declared on the host: that declaration
+	// (0,1,0) out-ranks a consumer's plain `hub-breadcrumb { … }` rule and shuts out
+	// any value inherited from an ancestor, so it is read here with its default.
+	$accent: var(--hub-breadcrumb-accent, var(--hub-sys-color-primary, #0d6efd));
+	--hub-breadcrumb-accent-emphasis: color-mix(in oklch, #{$accent} 80%, var(--hub-sys-color-ink, #212529));
+	--hub-breadcrumb-accent-subtle: color-mix(in oklch, #{$accent} 12%, var(--hub-sys-surface-page, #fff));
+	--hub-breadcrumb-accent-on: oklch(from #{$accent} clamp(0, (0.62 - l) * 1000, 1) 0 h);
+	--hub-breadcrumb-link-color: #{$accent};
 	--hub-breadcrumb-link-hover-color: var(--hub-breadcrumb-accent-emphasis, var(--hub-sys-link-hover-color, #0a58ca));
 	--hub-breadcrumb-link-decoration: none;
 	--hub-breadcrumb-link-hover-decoration: underline;
@@ -34,7 +34,7 @@
 	--hub-breadcrumb-focus-ring-radius: var(--hub-ref-radius-sm, 0.25rem);
 	// Collapsed indicator (the `…` button shown when `maxItems` folds the trail).
 	--hub-breadcrumb-collapsed-color: var(--hub-sys-text-muted, #6c757d);
-	--hub-breadcrumb-collapsed-hover-color: var(--hub-breadcrumb-accent);
+	--hub-breadcrumb-collapsed-hover-color: #{$accent};
 	--hub-breadcrumb-collapsed-bg: transparent;
 	--hub-breadcrumb-collapsed-hover-bg: var(--hub-breadcrumb-accent-subtle);
 	--hub-breadcrumb-divider: '>';
