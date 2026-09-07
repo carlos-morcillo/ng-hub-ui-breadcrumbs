@@ -1,8 +1,9 @@
 import { ApplicationRef, Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
+import { provideRouter, RouterLink } from '@angular/router';
 import { HubBreadcrumbItemDirective } from '../../directives/breadcrumb-item.directive';
+import { HubBreadcrumbLabelDirective } from '../../directives/breadcrumb-label.directive';
 import { BreadcrumbItem } from '../../models/breadcrumb-item';
 import { HubBreadcrumbsService } from '../../services/breadcrumbs.service';
 import { HubBreadcrumbComponent } from './breadcrumb.component';
@@ -32,6 +33,21 @@ const trail = (...labels: string[]): BreadcrumbItem[] => labels.map((label) => (
 })
 class CustomTemplateHostComponent {
 	readonly items = trail('Home', 'Products', 'Detail');
+}
+
+/** The same consumer, asking for truncation — the case `truncateItems` used to ignore. */
+@Component({
+	imports: [HubBreadcrumbComponent, HubBreadcrumbItemDirective, RouterLink],
+	template: `
+		<hub-breadcrumb [items]="items" [truncateItems]="true">
+			<ng-template hubBreadcrumbItem let-item>
+				<a class="custom-crumb" [routerLink]="item.url">{{ item.label }}</a>
+			</ng-template>
+		</hub-breadcrumb>
+	`
+})
+class TruncatedCustomTemplateHostComponent {
+	readonly items = trail('Home', 'A very long products section label', 'Detail');
 }
 
 describe('HubBreadcrumbComponent', () => {
@@ -306,6 +322,57 @@ describe('HubBreadcrumbComponent', () => {
 
 			expect(host.debugElement.queryAll(By.css('.custom-crumb')).length).toBe(3);
 			expect(currentFlags(host)).toEqual([null, null, 'page']);
+		});
+	});
+	// TD-146 — `truncateItems` clipped only the markup the component draws itself, so a
+	// consumer who took the markup over with `hubBreadcrumbItem` set the input and got
+	// nothing: scoped styles cannot reach an element the consuming component owns. The
+	// clipping box is now drawn by the component, around the projected content.
+	describe('truncation with a custom template', () => {
+		/**
+		 * The rule that clips a label, read off the stylesheet Angular actually injected —
+		 * jsdom lays nothing out, so the cascade is the only place the clipping is visible.
+		 * Whitespace is dropped so the assertions do not depend on how the compiler prints.
+		 */
+		const truncationRuleFor = (selector: string): string | undefined =>
+			Array.from(document.querySelectorAll('style'))
+				.map((style) => style.textContent ?? '')
+				.join('\n')
+				.replace(/\s+/g, '')
+				.split('}')
+				.filter((rule) => rule.includes('hub-breadcrumb--truncate'))
+				.find((rule) => rule.includes(selector));
+
+		it('wraps projected content in a clipping box the component owns', () => {
+			const host = TestBed.createComponent(TruncatedCustomTemplateHostComponent);
+			host.detectChanges();
+
+			const boxes = host.debugElement.queryAll(By.css('.hub-breadcrumb__item > .hub-breadcrumb__custom'));
+			expect(boxes.length, 'one clipping box per crumb').toBe(3);
+
+			for (const box of boxes) {
+				expect(box.query(By.css('.custom-crumb')), 'the projected crumb sits inside it').not.toBeNull();
+			}
+		});
+
+		it('clips that box exactly as it clips a built-in label', () => {
+			TestBed.createComponent(TruncatedCustomTemplateHostComponent).detectChanges();
+
+			const builtIn = truncationRuleFor('.hub-breadcrumb__link');
+			const projected = truncationRuleFor('.hub-breadcrumb__custom');
+
+			expect(builtIn, 'the built-in label is clipped').toBeDefined();
+			expect(projected, 'the projected-content box is clipped by the same rule').toBe(builtIn);
+			expect(projected, 'with the same max width').toContain('max-inline-size:var(--hub-breadcrumb-max-item-width,12rem)');
+			expect(projected, 'and with an ellipsis').toContain('text-overflow:ellipsis');
+		});
+
+		it('gives the projected label the overflow tooltip the built-in one gets', () => {
+			const host = TestBed.createComponent(TruncatedCustomTemplateHostComponent);
+			host.detectChanges();
+
+			const box = host.debugElement.query(By.css('.hub-breadcrumb__custom'));
+			expect(box.injector.get(HubBreadcrumbLabelDirective, null), 'the label directive is applied').not.toBeNull();
 		});
 	});
 });

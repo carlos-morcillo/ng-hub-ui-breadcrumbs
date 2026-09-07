@@ -279,20 +279,20 @@ El componente contenedor principal. Lee la ruta de breadcrumbs directamente del 
 
 #### Inputs
 
-| Input     | Tipo     | Por defecto | Descripción                                                                                                                                                                                                                                                                                                                                       |
-| --------- | -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variant` | `string` | `undefined` | Selecciona un **acento semántico** para los enlaces del breadcrumb y su hover. Los valores integrados (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark`) mapean a los tintes exactos del sistema de diseño; **también se acepta cualquier otra cadena**, que se resuelve a través de `--hub-sys-color-<variant>`. El elemento actual (el último) permanece siempre atenuado. Si se omite, los enlaces usan el color de enlace estándar (sin cambio visual). |
-| `truncateItems` | `boolean` | `false` | Si es `true`, recorta cada etiqueta a `--hub-breadcrumb-max-item-width` (por defecto `12rem`) con puntos suspensivos y muestra el texto completo como tooltip cuando una etiqueta desborda. Desactivado por defecto, así el layout estándar no cambia. Viste el marcado que renderiza el propio componente: una plantilla `hubBreadcrumbItem` aporta sus propios elementos, a los que los estilos encapsulados del componente no llegan — mira [`HubBreadcrumbLabelDirective`](#hubbreadcrumblabeldirective) para saber cómo se reengancha una plantilla personalizada. |
-| `items` | `BreadcrumbItem[] \| null` | `null` | Ruta proporcionada por ti, que sustituye a la derivada del router. Es la vía para las migas que el árbol de rutas no puede expresar: un ancestro servido por otra aplicación, o una ruta compuesta a mano. Si se deja en `null`, el componente sigue leyendo `HubBreadcrumbsService`. |
-| `maxItems` | `number \| undefined` | `undefined` | Longitud a partir de la cual la ruta se colapsa tras un indicador. `undefined` no colapsa nunca, por larga que sea la ruta. |
-| `itemsBeforeCollapse` | `number` | `1` | Migas que se conservan al principio de una ruta colapsada. |
-| `itemsAfterCollapse` | `number` | `1` | Migas que se conservan al final de una ruta colapsada, incluida la página actual. |
-| `collapsedAriaLabel` | `string` | `'Show the hidden breadcrumb items'` | Nombre accesible del indicador colapsado. Es un input porque es la única cadena que anuncia este componente, y la librería no incluye traducciones propias. |
+| Input                 | Tipo                       | Por defecto                          | Descripción                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------------- | -------------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`             | `string`                   | `undefined`                          | Selecciona un **acento semántico** para los enlaces del breadcrumb y su hover. Los valores integrados (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark`) mapean a los tintes exactos del sistema de diseño; **también se acepta cualquier otra cadena**, que se resuelve a través de `--hub-sys-color-<variant>`. El elemento actual (el último) permanece siempre atenuado. Si se omite, los enlaces usan el color de enlace estándar (sin cambio visual).                  |
+| `truncateItems`       | `boolean`                  | `false`                              | Si es `true`, recorta cada etiqueta a `--hub-breadcrumb-max-item-width` (por defecto `12rem`) con puntos suspensivos y muestra el texto completo como tooltip cuando una etiqueta desborda. Desactivado por defecto, así el layout estándar no cambia. También alcanza a una plantilla `hubBreadcrumbItem`: el componente dibuja la caja de recorte (`span.hub-breadcrumb__custom`) alrededor del contenido proyectado, porque los estilos encapsulados no llegan a elementos que pertenecen al componente consumidor. |
+| `items`               | `BreadcrumbItem[] \| null` | `null`                               | Ruta proporcionada por ti, que sustituye a la derivada del router. Es la vía para las migas que el árbol de rutas no puede expresar: un ancestro servido por otra aplicación, o una ruta compuesta a mano. Si se deja en `null`, el componente sigue leyendo `HubBreadcrumbsService`.                                                                                                                                                                                                                                  |
+| `maxItems`            | `number \| undefined`      | `undefined`                          | Longitud a partir de la cual la ruta se colapsa tras un indicador. `undefined` no colapsa nunca, por larga que sea la ruta.                                                                                                                                                                                                                                                                                                                                                                                            |
+| `itemsBeforeCollapse` | `number`                   | `1`                                  | Migas que se conservan al principio de una ruta colapsada.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `itemsAfterCollapse`  | `number`                   | `1`                                  | Migas que se conservan al final de una ruta colapsada, incluida la página actual.                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `collapsedAriaLabel`  | `string`                   | `'Show the hidden breadcrumb items'` | Nombre accesible del indicador colapsado. Es un input porque es la única cadena que anuncia este componente, y la librería no incluye traducciones propias.                                                                                                                                                                                                                                                                                                                                                            |
 
 #### Outputs
 
-| Output | Tipo | Descripción |
-| ------ | ---- | ----------- |
+| Output           | Tipo   | Descripción                                                                                                                                                                                                   |
+| ---------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `collapsedClick` | `void` | Se emite al activar el indicador colapsado. La ruta se expande por sí sola; el evento existe para consumidores que además quieran reaccionar — abrir un menú con las migas ocultas, registrar la interacción. |
 
 ```html
@@ -368,7 +368,7 @@ import { provideHubBreadcrumbTooltip } from 'ng-hub-ui-breadcrumbs';
 import { hubTooltipAdapter } from 'ng-hub-ui-utils';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideHubBreadcrumbTooltip(hubTooltipAdapter)]
+	providers: [provideHubBreadcrumbTooltip(hubTooltipAdapter)]
 };
 ```
 
@@ -386,24 +386,29 @@ Una directiva estructural que se usa para definir una plantilla personalizada pa
 
 ### HubBreadcrumbLabelDirective
 
-Añade el tooltip de desbordamiento a la etiqueta de una miga. El componente la aplica a las
-etiquetas que renderiza él mismo; se exporta para que una plantilla `hubBreadcrumbItem`
-personalizada pueda reengancharse.
+Añade el tooltip de desbordamiento a la etiqueta de una miga. Desde la 22.7.0 el componente
+envuelve la plantilla `hubBreadcrumbItem` en su propia caja de recorte, así que una miga
+personalizada recibe el tooltip sin pedirlo. Aplica la directiva a mano solo para darle otro
+texto.
 
-| Selector               | Input                                                          | Por defecto |
-| ---------------------- | -------------------------------------------------------------- | ----------- |
-| `[hubBreadcrumbLabel]` | `hubBreadcrumbLabel: string` (alias) — texto explícito del tooltip | `''`     |
+| Selector               | Input                                                              | Por defecto |
+| ---------------------- | ------------------------------------------------------------------ | ----------- |
+| `[hubBreadcrumbLabel]` | `hubBreadcrumbLabel: string` (alias) — texto explícito del tooltip | `''`        |
 
 Si se deja vacío, el texto del tooltip es el propio contenido de texto del elemento, y solo
 se muestra mientras ese texto esté recortado. La directiva no recorta nada: los puntos
-suspensivos vienen de los estilos de `truncateItems`, que solo alcanzan el marcado del
-componente, así que una plantilla personalizada debe recortar su etiqueta en su propia hoja
-de estilos. Importa `HubBreadcrumbLabelDirective` en el componente que declara la plantilla.
+suspensivos vienen de los estilos de `truncateItems`.
+
+Ponerla a mano es opcional. El componente ya la aplica a las etiquetas que renderiza y a la caja
+en la que envuelve una plantilla `hubBreadcrumbItem`, así que una miga personalizada se recorta y
+recibe su tooltip sin añadir nada. La directiva es para cuando el tooltip deba decir otra cosa
+distinta de la etiqueta —una ruta completa, una fecha escrita entera—; en ese caso importa
+`HubBreadcrumbLabelDirective` en el componente que declara la plantilla.
 
 ```html
 <hub-breadcrumb [truncateItems]="true">
 	<ng-template hubBreadcrumbItem let-item>
-		<a class="my-crumb" hubBreadcrumbLabel [routerLink]="item.url">{{ item.label }}</a>
+		<a class="my-crumb" [hubBreadcrumbLabel]="item.url" [routerLink]="item.url">{{ item.label }}</a>
 	</ng-template>
 </hub-breadcrumb>
 ```
@@ -414,21 +419,21 @@ El contrato por el que las etiquetas recortadas alcanzan un tooltip más rico. E
 estructuralmente y declarado aquí en vez de importado, así el paquete mantiene cero
 dependencias duras.
 
-| Export                           | Tipo                   | Descripción                                                              |
-| -------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
-| `provideHubBreadcrumbTooltip()`  | `EnvironmentProviders` | Registra un adaptador una sola vez para toda la aplicación.              |
-| `HUB_BREADCRUMB_TOOLTIP_ADAPTER` | `InjectionToken`       | El token que rellena el provider. Inyéctalo con `{ optional: true }`.    |
-| `HubBreadcrumbTooltipAdapter`    | interfaz               | `attach(host: HTMLElement, text: string): HubBreadcrumbTooltipHandle`.   |
-| `HubBreadcrumbTooltipHandle`     | interfaz               | `update(text: string): void` y `destroy(): void`.                        |
+| Export                           | Tipo                   | Descripción                                                            |
+| -------------------------------- | ---------------------- | ---------------------------------------------------------------------- |
+| `provideHubBreadcrumbTooltip()`  | `EnvironmentProviders` | Registra un adaptador una sola vez para toda la aplicación.            |
+| `HUB_BREADCRUMB_TOOLTIP_ADAPTER` | `InjectionToken`       | El token que rellena el provider. Inyéctalo con `{ optional: true }`.  |
+| `HubBreadcrumbTooltipAdapter`    | interfaz               | `attach(host: HTMLElement, text: string): HubBreadcrumbTooltipHandle`. |
+| `HubBreadcrumbTooltipHandle`     | interfaz               | `update(text: string): void` y `destroy(): void`.                      |
 
 ### HubBreadcrumbsService
 
 Un servicio inyectable (`providedIn: 'root'`) que publica la ruta de breadcrumbs. El componente lee la señal; también puedes inyectarlo directamente cuando necesites los datos de breadcrumb en otro lugar.
 
-| Miembro        | Tipo                           | Descripción                                                                       |
-| -------------- | ------------------------------ | --------------------------------------------------------------------------------- |
+| Miembro        | Tipo                           | Descripción                                                                        |
+| -------------- | ------------------------------ | ---------------------------------------------------------------------------------- |
 | `breadcrumbs`  | `Signal<BreadcrumbItem[]>`     | La ruta actual. Se lee en una plantilla o en un `computed`, sin nada que envolver. |
-| `breadcrumbs$` | `Observable<BreadcrumbItem[]>` | La misma ruta como flujo, para código que ya compone con rxjs.                    |
+| `breadcrumbs$` | `Observable<BreadcrumbItem[]>` | La misma ruta como flujo, para código que ya compone con rxjs.                     |
 
 Sustituir el servicio (un doble de test, una fachada sobre otra fuente) implica publicar
 `breadcrumbs`: es el miembro que lee el componente.
@@ -441,34 +446,34 @@ Sustituir el servicio (un doble de test, una fachada sobre otra fuente) implica 
 
 #### BreadcrumbItem
 
-| Propiedad | Tipo     | Descripción                                                      |
-| --------- | -------- | ---------------------------------------------------------------- |
-| `label`   | `string` | El texto resuelto que se muestra para el breadcrumb.             |
-| `url`     | `string` | El destino dentro de la aplicación, que se pasa a `routerLink`.  |
-| `data`    | `any`    | Opcional. El objeto data original de la ruta (útil para iconos, etc.). |
-| `href`    | `string` | Opcional. Destino externo. Si está presente, la miga se renderiza como enlace simple en lugar de `routerLink`. |
-| `target`  | `string` | Opcional. `target` del enlace (p. ej. `_blank`). Solo tiene sentido junto a `href`. |
-| `rel`     | `string` | Opcional. `rel` del enlace. Si se omite, una miga con `_blank` recibe igualmente `noopener noreferrer`. |
-| `download` | `string` | Opcional. `download` del enlace: la miga apunta a un archivo que se guarda, no a una página que se abre. |
+| Propiedad  | Tipo     | Descripción                                                                                                    |
+| ---------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| `label`    | `string` | El texto resuelto que se muestra para el breadcrumb.                                                           |
+| `url`      | `string` | El destino dentro de la aplicación, que se pasa a `routerLink`.                                                |
+| `data`     | `any`    | Opcional. El objeto data original de la ruta (útil para iconos, etc.).                                         |
+| `href`     | `string` | Opcional. Destino externo. Si está presente, la miga se renderiza como enlace simple en lugar de `routerLink`. |
+| `target`   | `string` | Opcional. `target` del enlace (p. ej. `_blank`). Solo tiene sentido junto a `href`.                            |
+| `rel`      | `string` | Opcional. `rel` del enlace. Si se omite, una miga con `_blank` recibe igualmente `noopener noreferrer`.        |
+| `download` | `string` | Opcional. `download` del enlace: la miga apunta a un archivo que se guarda, no a una página que se abre.       |
 
 #### BreadcrumbRouteConfig
 
 La forma de objeto que admite `data.breadcrumb` en una ruta, para las migas cuyo destino está fuera del router. Las formas de cadena y de función siguen siendo válidas y son la opción correcta para una miga interna normal.
 
-| Propiedad  | Tipo                                | Descripción                                                        |
-| ---------- | ----------------------------------- | ------------------------------------------------------------------ |
+| Propiedad  | Tipo                                | Descripción                                                            |
+| ---------- | ----------------------------------- | ---------------------------------------------------------------------- |
 | `label`    | `string \| ((data: any) => string)` | Etiqueta estática, o función que recibe el `data` resuelto de la ruta. |
-| `href`     | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                            |
-| `target`   | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                            |
-| `rel`      | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                            |
-| `download` | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                            |
+| `href`     | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                               |
+| `target`   | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                               |
+| `rel`      | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                               |
+| `download` | `string`                            | Opcional. Igual que en `BreadcrumbItem`.                               |
 
 #### BreadcrumbTemplateContext
 
-| Propiedad   | Tipo             | Descripción                                                            |
-| ----------- | ---------------- | ---------------------------------------------------------------------- |
-| `$implicit` | `BreadcrumbItem` | El objeto del elemento actual (enlazado mediante `let-item`).          |
-| `isLast`    | `boolean`        | `true` si este elemento es el último de la lista (página actual).      |
+| Propiedad   | Tipo             | Descripción                                                       |
+| ----------- | ---------------- | ----------------------------------------------------------------- |
+| `$implicit` | `BreadcrumbItem` | El objeto del elemento actual (enlazado mediante `let-item`).     |
+| `isLast`    | `boolean`        | `true` si este elemento es el último de la lista (página actual). |
 
 ## Estilos
 
@@ -558,7 +563,8 @@ hub-breadcrumb.docs-breadcrumb {
 	@include hub-breadcrumb-theme(
 		$bg: #f8fafc,
 		$padding-x: 0.75rem,
-		$divider: "'/'", // mantén las comillas interiores — alimenta `content` de CSS
+		$divider: "'/'",
+		// mantén las comillas interiores — alimenta `content` de CSS
 		$accent: var(--hub-sys-color-info)
 	);
 }

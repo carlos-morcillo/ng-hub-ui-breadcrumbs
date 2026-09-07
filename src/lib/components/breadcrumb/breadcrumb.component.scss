@@ -132,13 +132,20 @@
 // is clipped to `--hub-breadcrumb-max-item-width` with an ellipsis; the
 // `[hubBreadcrumbLabel]` directive surfaces the full text as a tooltip when a
 // label actually overflows.
+// `.hub-breadcrumb__custom` is the box the template draws around a
+// `hubBreadcrumbItem` crumb: the projected elements belong to the consuming
+// component and no scoped rule of ours can reach them, so the clipping has to
+// happen on something this component owns. Clipping the `<li>` instead would fold
+// the separator pseudo-element into the same box and quietly shorten every custom
+// label by its width.
 // `:host(...)` matches the host modifier under emulated encapsulation; the bare
 // `.hub-breadcrumb--truncate` form covers non-encapsulated/global usage (mirrors
 // the `[data-variant]` dual selectors above).
 :host(.hub-breadcrumb--truncate) .hub-breadcrumb__nav,
 .hub-breadcrumb--truncate .hub-breadcrumb__nav {
 	.hub-breadcrumb__link,
-	.hub-breadcrumb__text {
+	.hub-breadcrumb__text,
+	.hub-breadcrumb__custom {
 		display: inline-block;
 		max-inline-size: var(--hub-breadcrumb-max-item-width, 12rem);
 		overflow: hidden;

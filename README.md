@@ -279,20 +279,20 @@ The main container component. It reads the breadcrumb trail directly from the An
 
 #### Inputs
 
-| Input     | Type     | Default     | Description                                                                                                                                                                                                                                                                                                                  |
-| --------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `variant` | `string` | `undefined` | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change). |
-| `truncateItems` | `boolean` | `false` | When `true`, clips each label to `--hub-breadcrumb-max-item-width` (default `12rem`) with an ellipsis and shows the full text as a tooltip when a label overflows. Off by default, so the standard layout and wrapping are unchanged. It dresses the markup the component renders itself: a `hubBreadcrumbItem` template supplies its own elements, which the component's scoped styles cannot reach — see [`HubBreadcrumbLabelDirective`](#hubbreadcrumblabeldirective) for how a custom template opts back in. |
-| `items` | `BreadcrumbItem[] \| null` | `null` | Trail supplied by you, replacing the one derived from the router. The way in for crumbs the route tree cannot express — an ancestor served by another application, or a trail assembled by hand. Left `null`, the component keeps reading `HubBreadcrumbsService`. |
-| `maxItems` | `number \| undefined` | `undefined` | Length above which the trail collapses behind an indicator. Undefined never collapses, however long the trail grows. |
-| `itemsBeforeCollapse` | `number` | `1` | Crumbs kept at the head of a collapsed trail. |
-| `itemsAfterCollapse` | `number` | `1` | Crumbs kept at the tail of a collapsed trail, the current page included. |
-| `collapsedAriaLabel` | `string` | `'Show the hidden breadcrumb items'` | Accessible name of the collapsed indicator. It is an input because it is the one string this component announces, and the library carries no translations of its own. |
+| Input                 | Type                       | Default                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------- | -------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`             | `string`                   | `undefined`                          | Selects a **semantic accent** for the breadcrumb links and their hover. The built-in values (`primary`, `secondary`, `success`, `danger`, `warning`, `info`, `neutral`, `light`, `dark`) map to the exact design-system tints; **any other string is also accepted** and resolves through `--hub-sys-color-<variant>`. The current (last) item always stays muted. When omitted, links use the standard link colour (no visual change).                        |
+| `truncateItems`       | `boolean`                  | `false`                              | When `true`, clips each label to `--hub-breadcrumb-max-item-width` (default `12rem`) with an ellipsis and shows the full text as a tooltip when a label overflows. Off by default, so the standard layout and wrapping are unchanged. It covers a `hubBreadcrumbItem` template too: the component draws the clipping box (`span.hub-breadcrumb__custom`) around the projected content, since scoped styles cannot reach elements the consuming component owns. |
+| `items`               | `BreadcrumbItem[] \| null` | `null`                               | Trail supplied by you, replacing the one derived from the router. The way in for crumbs the route tree cannot express — an ancestor served by another application, or a trail assembled by hand. Left `null`, the component keeps reading `HubBreadcrumbsService`.                                                                                                                                                                                             |
+| `maxItems`            | `number \| undefined`      | `undefined`                          | Length above which the trail collapses behind an indicator. Undefined never collapses, however long the trail grows.                                                                                                                                                                                                                                                                                                                                           |
+| `itemsBeforeCollapse` | `number`                   | `1`                                  | Crumbs kept at the head of a collapsed trail.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `itemsAfterCollapse`  | `number`                   | `1`                                  | Crumbs kept at the tail of a collapsed trail, the current page included.                                                                                                                                                                                                                                                                                                                                                                                       |
+| `collapsedAriaLabel`  | `string`                   | `'Show the hidden breadcrumb items'` | Accessible name of the collapsed indicator. It is an input because it is the one string this component announces, and the library carries no translations of its own.                                                                                                                                                                                                                                                                                          |
 
 #### Outputs
 
-| Output | Type | Description |
-| ------ | ---- | ----------- |
+| Output           | Type   | Description                                                                                                                                                                                         |
+| ---------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `collapsedClick` | `void` | Fires when the collapsed indicator is activated. The trail expands on its own; the event is there for consumers that want to react as well — open a menu of the hidden crumbs, log the interaction. |
 
 ```html
@@ -368,7 +368,7 @@ import { provideHubBreadcrumbTooltip } from 'ng-hub-ui-breadcrumbs';
 import { hubTooltipAdapter } from 'ng-hub-ui-utils';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideHubBreadcrumbTooltip(hubTooltipAdapter)]
+	providers: [provideHubBreadcrumbTooltip(hubTooltipAdapter)]
 };
 ```
 
@@ -386,23 +386,28 @@ A structural directive used to define a custom template for breadcrumb items.
 
 ### HubBreadcrumbLabelDirective
 
-Adds the overflow tooltip to a breadcrumb label. The component applies it to the labels it
-renders itself; it is exported so a custom `hubBreadcrumbItem` template can opt back in.
+Adds the overflow tooltip to a breadcrumb label. Since 22.7.0 the component wraps a
+`hubBreadcrumbItem` template in its own clipping box, so a custom crumb gets the tooltip
+without asking. Apply the directive by hand only to give it different text.
 
-| Selector               | Input                                     | Default |
-| ---------------------- | ----------------------------------------- | ------- |
-| `[hubBreadcrumbLabel]` | `hubBreadcrumbLabel: string` (alias) — explicit tooltip text | `''` |
+| Selector               | Input                                                        | Default |
+| ---------------------- | ------------------------------------------------------------ | ------- |
+| `[hubBreadcrumbLabel]` | `hubBreadcrumbLabel: string` (alias) — explicit tooltip text | `''`    |
 
 Left empty, the tooltip text is the host element's own text content, and it is shown only
 while that text is actually clipped. The directive never clips anything itself: the ellipsis
-comes from the `truncateItems` styles, which reach only the component's own markup, so a
-custom template has to clip its label in its own stylesheet. Import
-`HubBreadcrumbLabelDirective` into the component that declares the template.
+comes from the `truncateItems` styles.
+
+Applying it by hand is optional. The component already puts it on the labels it renders and on
+the box it wraps a `hubBreadcrumbItem` template in, so a custom crumb is clipped and gets its
+tooltip with nothing added. Reach for the directive when the tooltip should say something other
+than the label — a full path, a date spelled out — and import `HubBreadcrumbLabelDirective` into
+the component that declares the template.
 
 ```html
 <hub-breadcrumb [truncateItems]="true">
 	<ng-template hubBreadcrumbItem let-item>
-		<a class="my-crumb" hubBreadcrumbLabel [routerLink]="item.url">{{ item.label }}</a>
+		<a class="my-crumb" [hubBreadcrumbLabel]="item.url" [routerLink]="item.url">{{ item.label }}</a>
 	</ng-template>
 </hub-breadcrumb>
 ```
@@ -412,21 +417,21 @@ custom template has to clip its label in its own stylesheet. Import
 The contract truncated labels use to reach a richer tooltip. It is structurally typed and
 declared here rather than imported, so the package keeps zero hard dependencies.
 
-| Export                           | Kind                   | Description                                                              |
-| -------------------------------- | ---------------------- | ------------------------------------------------------------------------ |
-| `provideHubBreadcrumbTooltip()`  | `EnvironmentProviders` | Registers an adapter once for the whole application.                     |
-| `HUB_BREADCRUMB_TOOLTIP_ADAPTER` | `InjectionToken`       | The token the provider fills. Inject it with `{ optional: true }`.       |
-| `HubBreadcrumbTooltipAdapter`    | interface              | `attach(host: HTMLElement, text: string): HubBreadcrumbTooltipHandle`.   |
-| `HubBreadcrumbTooltipHandle`     | interface              | `update(text: string): void` and `destroy(): void`.                      |
+| Export                           | Kind                   | Description                                                            |
+| -------------------------------- | ---------------------- | ---------------------------------------------------------------------- |
+| `provideHubBreadcrumbTooltip()`  | `EnvironmentProviders` | Registers an adapter once for the whole application.                   |
+| `HUB_BREADCRUMB_TOOLTIP_ADAPTER` | `InjectionToken`       | The token the provider fills. Inject it with `{ optional: true }`.     |
+| `HubBreadcrumbTooltipAdapter`    | interface              | `attach(host: HTMLElement, text: string): HubBreadcrumbTooltipHandle`. |
+| `HubBreadcrumbTooltipHandle`     | interface              | `update(text: string): void` and `destroy(): void`.                    |
 
 ### HubBreadcrumbsService
 
 An injectable (`providedIn: 'root'`) service that publishes the breadcrumb trail. The component reads the signal; you can also inject it directly when you need the breadcrumb data elsewhere.
 
-| Member         | Type                           | Description                                                                        |
-| -------------- | ------------------------------ | ---------------------------------------------------------------------------------- |
-| `breadcrumbs`  | `Signal<BreadcrumbItem[]>`     | The current trail. Read it in a template or a `computed`, with nothing to wrap.    |
-| `breadcrumbs$` | `Observable<BreadcrumbItem[]>` | The same trail as a stream, for code already composing with rxjs.                  |
+| Member         | Type                           | Description                                                                     |
+| -------------- | ------------------------------ | ------------------------------------------------------------------------------- |
+| `breadcrumbs`  | `Signal<BreadcrumbItem[]>`     | The current trail. Read it in a template or a `computed`, with nothing to wrap. |
+| `breadcrumbs$` | `Observable<BreadcrumbItem[]>` | The same trail as a stream, for code already composing with rxjs.               |
 
 Replacing the service (a test double, a facade over another source) means publishing
 `breadcrumbs`: that is the member the component reads.
@@ -439,33 +444,33 @@ Replacing the service (a test double, a facade over another source) means publis
 
 #### BreadcrumbItem
 
-| Property | Type     | Description                                              |
-| -------- | -------- | -------------------------------------------------------- |
-| `label`  | `string` | The resolved text to display for the breadcrumb.         |
-| `url`    | `string` | The in-app destination, handed to `routerLink`.          |
-| `data`   | `any`    | Optional. The original route data object (useful for icons, etc.). |
-| `href`   | `string` | Optional. External destination. When present the crumb renders a plain anchor instead of a `routerLink`. |
-| `target` | `string` | Optional. Anchor `target` (e.g. `_blank`). Only meaningful alongside `href`. |
-| `rel`    | `string` | Optional. Anchor `rel`. Left unset, a `_blank` crumb still gets `noopener noreferrer`. |
-| `download` | `string` | Optional. Anchor `download`: the crumb points at a file to save instead of a page to open. |
+| Property   | Type     | Description                                                                                              |
+| ---------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `label`    | `string` | The resolved text to display for the breadcrumb.                                                         |
+| `url`      | `string` | The in-app destination, handed to `routerLink`.                                                          |
+| `data`     | `any`    | Optional. The original route data object (useful for icons, etc.).                                       |
+| `href`     | `string` | Optional. External destination. When present the crumb renders a plain anchor instead of a `routerLink`. |
+| `target`   | `string` | Optional. Anchor `target` (e.g. `_blank`). Only meaningful alongside `href`.                             |
+| `rel`      | `string` | Optional. Anchor `rel`. Left unset, a `_blank` crumb still gets `noopener noreferrer`.                   |
+| `download` | `string` | Optional. Anchor `download`: the crumb points at a file to save instead of a page to open.               |
 
 #### BreadcrumbRouteConfig
 
 The object form accepted by a route's `data.breadcrumb`, for crumbs whose destination lies outside the router. The string and function forms stay valid and remain the right choice for an ordinary in-app crumb.
 
-| Property   | Type                                  | Description                                                    |
-| ---------- | ------------------------------------- | -------------------------------------------------------------- |
-| `label`    | `string \| ((data: any) => string)`   | Static label, or a function receiving the route's resolved `data`. |
-| `href`     | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
-| `target`   | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
-| `rel`      | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
-| `download` | `string`                              | Optional. Same as on `BreadcrumbItem`.                          |
+| Property   | Type                                | Description                                                        |
+| ---------- | ----------------------------------- | ------------------------------------------------------------------ |
+| `label`    | `string \| ((data: any) => string)` | Static label, or a function receiving the route's resolved `data`. |
+| `href`     | `string`                            | Optional. Same as on `BreadcrumbItem`.                             |
+| `target`   | `string`                            | Optional. Same as on `BreadcrumbItem`.                             |
+| `rel`      | `string`                            | Optional. Same as on `BreadcrumbItem`.                             |
+| `download` | `string`                            | Optional. Same as on `BreadcrumbItem`.                             |
 
 #### BreadcrumbTemplateContext
 
-| Property    | Type             | Description                                                    |
-| ----------- | ---------------- | -------------------------------------------------------------- |
-| `$implicit` | `BreadcrumbItem` | The current breadcrumb item object (bound via `let-item`).     |
+| Property    | Type             | Description                                                     |
+| ----------- | ---------------- | --------------------------------------------------------------- |
+| `$implicit` | `BreadcrumbItem` | The current breadcrumb item object (bound via `let-item`).      |
 | `isLast`    | `boolean`        | `true` if this item is the last one in the list (current page). |
 
 ## Styling
@@ -554,7 +559,8 @@ hub-breadcrumb.docs-breadcrumb {
 	@include hub-breadcrumb-theme(
 		$bg: #f8fafc,
 		$padding-x: 0.75rem,
-		$divider: "'/'", // keep the inner quotes — it feeds CSS `content`
+		$divider: "'/'",
+		// keep the inner quotes — it feeds CSS `content`
 		$accent: var(--hub-sys-color-info)
 	);
 }

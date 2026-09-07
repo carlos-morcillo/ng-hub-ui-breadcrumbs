@@ -20,6 +20,7 @@ This table details the functionalities of the `ng-hub-ui-breadcrumbs` library an
 |                  | `(collapsedClick)` — the expander was pressed                |       [x]       |
 | **Truncation**   | `truncateItems` — ellipsise a long label                     |       [x]       |
 |                  | Tooltip on a truncated label (`provideHubBreadcrumbTooltip`) |       [x]       |
+|                  | Truncation of a `hubBreadcrumbItem` crumb                    |       [ ]       |
 | **Appearance**   | `variant`                                                    |       [x]       |
 |                  | CSS variables theming                                        |       [x]       |
 |                  | `hub-breadcrumb-theme()` mixin                               |       [x]       |

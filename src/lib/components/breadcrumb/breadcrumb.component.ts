@@ -84,6 +84,10 @@ export class HubBreadcrumbComponent {
 	 * exposes its full text as a tooltip (native `title`, or the hub-ui tooltip
 	 * when {@link provideHubBreadcrumbTooltip} is wired). Off by default, so the
 	 * standard breadcrumb layout is unchanged.
+	 *
+	 * It reaches a `hubBreadcrumbItem` template as well: the projected elements
+	 * belong to the consuming component, so the template wraps them in a
+	 * `span.hub-breadcrumb__custom` of its own and clips that instead.
 	 */
 	readonly truncateItems = input(false);
 

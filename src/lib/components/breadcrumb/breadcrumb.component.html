@@ -8,13 +8,22 @@
 					[attr.aria-current]="row.isLast ? 'page' : null"
 				>
 					@if (itemTemplate(); as template) {
-						<ng-container
-							[ngTemplateOutlet]="template"
-							[ngTemplateOutletContext]="{
-								$implicit: item,
-								isLast: row.isLast
-							}"
-						/>
+						<!--
+							The clipping box for a custom crumb. Scoped styles never reach the elements
+							a `hubBreadcrumbItem` template renders — they belong to the consuming
+							component — so `truncateItems` can only clip something this component draws
+							itself. It sits exactly where a built-in label sits, inside the item and
+							outside the separator, so a projected crumb gets the same width as any other.
+						-->
+						<span class="hub-breadcrumb__custom" hubBreadcrumbLabel>
+							<ng-container
+								[ngTemplateOutlet]="template"
+								[ngTemplateOutletContext]="{
+									$implicit: item,
+									isLast: row.isLast
+								}"
+							/>
+						</span>
 					} @else if (row.isLast) {
 						<span class="hub-breadcrumb__text" hubBreadcrumbLabel>{{ item.label }}</span>
 					} @else if (item.href) {

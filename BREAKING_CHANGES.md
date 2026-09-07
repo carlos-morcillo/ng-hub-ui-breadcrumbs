@@ -4,6 +4,21 @@ Every release of `ng-hub-ui-breadcrumbs` that asks something of a consumer, newe
 major tracks the Angular major this library targets, so a breaking change ships inside a minor
 and this file is the notice semver cannot give.
 
+## [22.7.0] - 2026-09-07
+### A `hubBreadcrumbItem` template renders inside a `span.hub-breadcrumb__custom`
+
+- **Change**: the component now wraps the projected content of a custom item template in a
+  `<span class="hub-breadcrumb__custom">` of its own. That span is what `truncateItems` clips —
+  scoped styles cannot reach elements the consuming component owns, which is why the input used
+  to be ignored whenever the markup had been taken over.
+- **Impact**: the crumb's markup is one element deeper. A selector written against the old shape
+  — `.hub-breadcrumb__item > a`, `li > .my-crumb`, a `:first-child` counted from the item — stops
+  matching. Nothing in TypeScript notices; the styles simply stop applying.
+- **Migration**: drop the direct-child combinator (`.hub-breadcrumb__item a`), or target the new
+  box (`.hub-breadcrumb__custom > .my-crumb`). If the template clipped its own label to work
+  around the old limitation, that CSS can go: the box clips it now, and a width set on both is
+  applied twice.
+
 ## [22.6.0] - 2026-09-06
 ### `HubBreadcrumbComponent.breadcrumbs$` is gone
 

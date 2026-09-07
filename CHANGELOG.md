@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.7.0] - 2026-09-07
+
+### Fixed
+
+- **`truncateItems` now clips a crumb rendered by a `hubBreadcrumbItem` template.** The clipping
+  rules named only the classes the component draws, and the elements a custom template renders
+  belong to the consuming component, where a scoped rule cannot reach them — so a consumer who
+  had personalised the markup set the input and got nothing at all, in silence. The component now
+  draws the clipping box itself, a `span.hub-breadcrumb__custom` wrapped around the projected
+  content, and the same rule clips it to `--hub-breadcrumb-max-item-width`. It sits inside the
+  item and outside the separator, so a custom crumb gets exactly the width a built-in one gets;
+  clipping the `<li>` instead would have folded the separator into the same box and shortened
+  every custom label by its width.
+
+### Changed
+
+- **A custom crumb gets the overflow tooltip too.** The new box carries `hubBreadcrumbLabel`, so
+  the full text of a clipped custom label is exposed the way a built-in one's is — the native
+  `title`, or the hub-ui tooltip when `provideHubBreadcrumbTooltip()` is wired. Applying the
+  directive by hand inside the template is no longer needed, and is now only for overriding the
+  tooltip text.
+
+- **A `hubBreadcrumbItem` template renders one element deeper.** See `BREAKING_CHANGES.md`.
+
 ## [22.6.0] - 2026-09-06
 
 ### Added

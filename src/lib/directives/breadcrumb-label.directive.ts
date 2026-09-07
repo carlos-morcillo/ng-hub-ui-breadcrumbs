@@ -5,12 +5,16 @@ import { HubBreadcrumbTooltipHandle } from '../breadcrumb-tooltip/breadcrumb-too
 /**
  * Adds an overflow-aware tooltip to a breadcrumb label element.
  *
- * Apply `[hubBreadcrumbLabel]` to the link/text of each breadcrumb item. When the
- * label is truncated (its rendered text is wider than its box — typically because
- * `hub-breadcrumb` truncation is enabled), the directive exposes the full text as
- * a tooltip: the native `title` attribute by default, or the richer hub-ui
+ * When the label is truncated (its rendered text is wider than its box — typically
+ * because `hub-breadcrumb` truncation is enabled), the directive exposes the full
+ * text as a tooltip: the native `title` attribute by default, or the richer hub-ui
  * tooltip when a {@link HUB_BREADCRUMB_TOOLTIP_ADAPTER} is provided. When the
  * label fits, no tooltip is shown.
+ *
+ * `hub-breadcrumb` already applies it to the labels it renders and to the box it
+ * wraps a `hubBreadcrumbItem` template in, so applying `[hubBreadcrumbLabel]` by
+ * hand is for saying something other than the label — a full path, a spelled-out
+ * date — through the directive's own input.
  */
 @Directive({
 	selector: '[hubBreadcrumbLabel]'
