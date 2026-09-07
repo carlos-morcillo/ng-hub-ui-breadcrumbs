@@ -363,7 +363,9 @@ describe('HubBreadcrumbComponent', () => {
 
 			expect(builtIn, 'the built-in label is clipped').toBeDefined();
 			expect(projected, 'the projected-content box is clipped by the same rule').toBe(builtIn);
-			expect(projected, 'with the same max width').toContain('max-inline-size:var(--hub-breadcrumb-max-item-width,12rem)');
+			expect(projected, 'with the same max width').toContain(
+				'max-inline-size:var(--hub-breadcrumb-max-item-width,12rem)'
+			);
 			expect(projected, 'and with an ellipsis').toContain('text-overflow:ellipsis');
 		});
 
