@@ -573,7 +573,7 @@ not declared on the host, so it may sit on an ancestor and still recolour the li
 
 All notable changes are documented in the [CHANGELOG.md](./CHANGELOG.md). For breaking changes, see [BREAKING_CHANGES.md](./BREAKING_CHANGES.md).
 
-The latest release is **v22.5.2**, a fix for a breadcrumb drawn before the first navigation completes. The collapsing inputs, crumbs pointing outside the router and the keyboard focus ring arrived in **v22.5.0**; the packaging path `ng-hub-ui-breadcrumbs/styles` in **v22.4.0**.
+The latest release is **v22.7.1**, which declares the optional `ng-hub-ui-ds` peer the token defaults have always resolved against. **v22.7.0** made `truncateItems` clip a crumb rendered by a `hubBreadcrumbItem` template, which it had never reached; **v22.6.0** published the trail as a signal on `HubBreadcrumbsService.breadcrumbs` and stopped the component re-exporting `breadcrumbs$`.
 
 ## Contributing
 

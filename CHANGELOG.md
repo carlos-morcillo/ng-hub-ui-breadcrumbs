@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [22.7.1] - 2026-09-08
+
+### Added
+
+- **`ng-hub-ui-ds` is declared as an optional peer dependency** (`>=22.0.0`). Every
+  `--hub-breadcrumb-*` default resolves through the family's `--hub-sys-*` / `--hub-ref-*` ladder,
+  which is what makes the trail match a theme and its dark mode before anything is overridden, and
+  the manifest said nothing about it — so a consumer reading the package on npm could not tell which
+  package supplies those values. It is genuinely optional: every token ends in a literal fallback.
+
 ## [22.7.0] - 2026-09-07
 
 ### Fixed

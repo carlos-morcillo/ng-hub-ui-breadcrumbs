@@ -577,7 +577,7 @@ que puede vivir en un ancestro y aun así recolorear los enlaces.
 
 Todos los cambios relevantes están documentados en el [CHANGELOG.md](./CHANGELOG.md). Para los cambios incompatibles, consulta [BREAKING_CHANGES.md](./BREAKING_CHANGES.md).
 
-La última versión es la **v22.5.2**, una corrección para el breadcrumb dibujado antes de que termine la primera navegación. Los inputs de colapso, las migas que apuntan fuera del router y el anillo de foco de teclado llegaron en la **v22.5.0**; la ruta de empaquetado `ng-hub-ui-breadcrumbs/styles`, en la **v22.4.0**.
+La última versión es la **v22.7.1**, que declara el peer opcional `ng-hub-ui-ds` contra el que siempre se han resuelto los valores por defecto de los tokens. La **v22.7.0** hizo que `truncateItems` recorte una miga dibujada por una plantilla `hubBreadcrumbItem`, a la que nunca llegaba; la **v22.6.0** publicó la ruta como signal en `HubBreadcrumbsService.breadcrumbs` y dejó de reexportar `breadcrumbs$` desde el componente.
 
 ## Contribución
 
